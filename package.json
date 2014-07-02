@@ -1,0 +1,22 @@
+{
+  "name": "funnel",
+  "version": "0.0.1",
+  "description": "simple whitelisted statsd passthrough.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajacksified/funnel.git"
+  },
+  "keywords": [
+    "statsd"
+  ],
+  "author": "Jack Lawson <ajacksified@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajacksified/funnel/issues"
+  },
+  "homepage": "https://github.com/ajacksified/funnel"
+}
