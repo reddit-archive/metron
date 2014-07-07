@@ -2,9 +2,9 @@
   "name": "funnel",
   "version": "0.0.1",
   "description": "simple whitelisted statsd passthrough.",
-  "main": "index.js",
+  "main": "src/funnel.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/ajacksified/funnel/issues"
   },
-  "homepage": "https://github.com/ajacksified/funnel"
+  "homepage": "https://github.com/ajacksified/funnel",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.20.1",
+    "sinon": "^1.10.2",
+    "sinon-chai": "^2.5.0",
+    "sinon-mocha": "0.0.3"
+  }
 }
