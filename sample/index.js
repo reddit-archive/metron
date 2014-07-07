@@ -1,5 +1,5 @@
 var Funnel = require('../src/funnel'),
-    config = require ('./config.json');
+    config = require ('./config.js');
 
 var server = new Funnel(config);
 server.start();

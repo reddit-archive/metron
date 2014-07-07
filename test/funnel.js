@@ -19,5 +19,17 @@ describe('Funnel', function() {
     var funnel = new Funnel(config)
     expect(funnel.get('port')).to.equal(80);
   });
+
+  it('can get config values', function(){
+    var funnel = new Funnel(config)
+    expect(funnel.get('port')).to.equal(funnel.config.port);
+  });
+
+  it('can set config values', function(){
+    var funnel = new Funnel(config)
+
+    funnel.set({ port: 8080 });
+    expect(funnel.get('port')).to.equal(8080);
+  });
 });
 
