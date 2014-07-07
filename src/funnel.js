@@ -99,11 +99,7 @@ Funnel.prototype.processParameters = function(params, req, res){
 }
 
 Funnel.prototype.record = function(name, value, config){
-  if(!config.dataStore){
-    console.log(name + ': ' + value);
-  }else{
-    config.dataStore(name, value);
-  }
+  config.dataStore(name, value);
 }
 
 module.exports = Funnel;
