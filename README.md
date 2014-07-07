@@ -1,7 +1,7 @@
 funnel
 ======
 
-![https://travis-ci.org/ajacksified/funnel](https://travis-ci.org/ajacksified/funnel.svg)
+[![travis-ci status](https://travis-ci.org/ajacksified/funnel.svg)](http://travis-ci.org/ajacksified/funnel)
 
 simple whitelisted statsd passthrough.
 
