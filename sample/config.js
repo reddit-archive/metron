@@ -11,7 +11,7 @@ var stringConfig = {
 
 var config = {
   port: 8000,
-  routes: {
+  segments: {
     rum: {
       parameters: {
         dnsTiming: intConfig,

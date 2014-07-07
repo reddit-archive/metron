@@ -1,7 +1,12 @@
 /* jshint strict:false */
 
+var http = require('http');
+var url = require('url');
+var qs = require('querystring');
+var Parameter = require('./parameter');
+
 var defaultConfig = {
-  rules: [],
+  segments: [],
   port: 8000
 };
 
@@ -23,8 +28,82 @@ Funnel.prototype.set = function(obj){
 }
 
 Funnel.prototype.start = function(){
-  // start http server
-  // serve requests
+  var server  = http.createServer(this.processRequest.bind(this));
+  this.server = server;
+
+  server.listen(this.get('port'));
+}
+
+Funnel.prototype.stop = function(){
+  this.server.close();
+}
+
+Funnel.prototype.processRequest = function(req, res){
+  var params = { };
+  var parsedUrl = url.parse(req.url, true);
+
+  if(req.method === 'GET'){
+    try{
+      params = JSON.parse(parsedUrl.query.data);
+    }catch(e){
+      return this.endRequest(req, res, 422);
+    }
+
+    this.processParameters(params, req, res);
+  }else{
+    var body = [];
+
+    req.on('data', function (data) {
+      body.push(data.toString());
+    });
+
+    req.on('end', function () {
+      body = body.join('');
+
+      if(req.headers['Content-Type'].toLowerCase().indexOf('json') > -1){
+        params = JSON.parse(body);
+      }else{
+        params = qs.parse(body);
+      }
+
+      this.processParameters(params, req, res);
+    });
+  }
+}
+
+Funnel.prototype.endRequest = function(req, res, statusCode){
+  res.writeHead(statusCode || 204);
+  res.end();
+};
+
+Funnel.prototype.processParameters = function(params, req, res){
+  for(var segmentName in params){
+    var segmentConfig = this.config.segments[segmentName];
+    var segment = params[segmentName];
+
+    if(!segmentConfig)
+      return this.endRequest(req, res, 422);
+
+    for(var statName in segment){
+      var statConfig = segmentConfig[statName];
+      var statValue = new Parameter(segment[statName], statConfig).value();
+
+      if(statValue === undefined)
+        return this.endRequest(req, res, 422);
+
+      this.record(statName, statValue, statConfig);
+    }
+  }
+
+  this.endRequest(req, res);
+}
+
+Funnel.prototype.record = function(name, value, config){
+  if(!config.dataStore){
+    console.log(name + ': ' + value);
+  }else{
+    config.dataStore(name, value);
+  }
 }
 
 module.exports = Funnel;
