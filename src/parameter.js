@@ -1,9 +1,7 @@
 /* jshint strict:false */
 
 var defaultConfig = {
-  dataStore: function(name, val){
-    console.log(name + ': ' + val);
-  }
+
 };
 
 var conversion = {

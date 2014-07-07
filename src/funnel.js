@@ -92,16 +92,14 @@ Funnel.prototype.processParameters = function(params, req, res){
       var statConfig = segmentConfig[statName];
       var statValue = new Parameter(segment[statName], statConfig).value();
 
-      if(statValue !== undefined)
-        this.record(statName, statValue, statConfig);
+      if(statValue !== undefined){
+        var store = statConfig.dataStore || segmentConfig.dataStore || console.log;
+        store(statName, statValue);
+      }
     }
   }
 
   this.endRequest(req, res);
-}
-
-Funnel.prototype.record = function(name, value, config){
-  config.dataStore(name, value);
 }
 
 module.exports = Funnel;
