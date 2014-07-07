@@ -54,7 +54,7 @@ describe('Funnel server', function(){
 
   it('starts a server', function(done){
     http.get('http://127.0.0.1:' + config.port, function(res){
-      expect(res.statusCode).to.equal(422);
+      expect(res.statusCode).to.equal(400);
       done();
     });
   });

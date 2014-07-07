@@ -46,7 +46,7 @@ Funnel.prototype.processRequest = function(req, res){
     try{
       params = JSON.parse(parsedUrl.query.data);
     }catch(e){
-      return this.endRequest(req, res, 422);
+      return this.endRequest(req, res, 400);
     }
 
     this.processParameters(params, req, res);
@@ -61,7 +61,11 @@ Funnel.prototype.processRequest = function(req, res){
       body = body.join('');
 
       if(req.headers['Content-Type'].toLowerCase().indexOf('json') > -1){
-        params = JSON.parse(body);
+        try{
+          params = JSON.parse(body);
+        }catch(e){
+          return this.endRequest(req, res, 400);
+        }
       }else{
         params = qs.parse(body);
       }
@@ -88,10 +92,8 @@ Funnel.prototype.processParameters = function(params, req, res){
       var statConfig = segmentConfig[statName];
       var statValue = new Parameter(segment[statName], statConfig).value();
 
-      if(statValue === undefined)
-        return this.endRequest(req, res, 422);
-
-      this.record(statName, statValue, statConfig);
+      if(statValue !== undefined)
+        this.record(statName, statValue, statConfig);
     }
   }
 
