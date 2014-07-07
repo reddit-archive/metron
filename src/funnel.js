@@ -94,7 +94,17 @@ Funnel.prototype.processParameters = function(params, req, res){
 
       if(statValue !== undefined){
         var store = statConfig.dataStore || segmentConfig.dataStore || console.log;
-        store(statName, statValue);
+
+        var config = { };
+        for(var key in segmentConfig){
+          config[key] = segmentConfig[key];
+        }
+
+        for(key in statConfig){
+          config[key] = segmentConfig[key];
+        }
+
+        store(statName, statValue, config);
       }
     }
   }
