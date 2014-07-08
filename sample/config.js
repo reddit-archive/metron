@@ -13,17 +13,15 @@ var config = {
   port: 8000,
   segments: {
     rum: {
-      parameters: {
-        dnsTiming: intConfig,
-        tcpTiming: intConfig,
-        requestTiming: intConfig,
-        responseTiming: intConfig,
-        domLoadingTiming: intConfig,
-        domnumbereractiveTiming: intConfig,
-        domContentLoadedTiming: intConfig,
-        actionName: stringConfig,
-        verification: stringConfig,
-      }
+      dnsTiming: intConfig,
+      tcpTiming: intConfig,
+      requestTiming: intConfig,
+      responseTiming: intConfig,
+      domLoadingTiming: intConfig,
+      domnumbereractiveTiming: intConfig,
+      domContentLoadedTiming: intConfig,
+      actionName: stringConfig,
+      verification: stringConfig,
     }
   }
 }

@@ -39,22 +39,30 @@ var statsdStore = function(name, val, config){
 /* end statsd pseudocode */
 
 var config = {
+  // The port to run the funnel server on
   port: 8000,
+
+  // The list of data segments to store. A segment is way to categorize
+  // individual parameters.
   segments: {
+    // You can specify a datastore at th segment *or* at the parameter level.
     dataStore: statsdStore,
+
+    // Our first segment, `rum`.
     rum: {
-      parameters: {
-        // You can specify a number of options to format and filter the values
-        // before they hit your data store. You can also add any arbitrary keys
-        // you might want sent to your datastore or validation, such as a statsd
-        // data type.
-        pageLoadTime: {
-          min: 0,
-          max: 10000,
-          format: function(val){ },
-          validate: function(val){ },
-          dataType: 'timer'
-        }
+      // This is a sample definition for the `pageLoadTime` parameter in the
+      // `rum` segment.
+      // 
+      // You can specify a number of options to format and filter the values
+      // before they hit your data store. You can also add any arbitrary keys
+      // you might want sent to your datastore or validation, such as a statsd
+      // data type.
+      pageLoadTime: {
+        min: 0,
+        max: 10000,
+        format: function(val){ },
+        validate: function(val){ },
+        dataType: 'timer'
       }
     }
   }
