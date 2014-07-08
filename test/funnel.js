@@ -1,5 +1,5 @@
 /* jshint strict:false */
-/* global describe,it */
+/* global describe,it,beforeEach,afterEach */
 
 var Funnel = require('../src/funnel'),
     sinon = require('sinon'),

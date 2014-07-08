@@ -45,23 +45,33 @@ var config = {
   // The list of data segments to store. A segment is way to categorize
   // individual parameters.
   segments: {
-    // You can specify a datastore at th segment *or* at the parameter level.
+    // You can specify a datastore at the segment or at the parameter level.
     dataStore: statsdStore,
 
     // Our first segment, `rum`.
     rum: {
       // This is a sample definition for the `pageLoadTime` parameter in the
       // `rum` segment.
-      // 
+      //
       // You can specify a number of options to format and filter the values
       // before they hit your data store. You can also add any arbitrary keys
       // you might want sent to your datastore or validation, such as a statsd
       // data type.
       pageLoadTime: {
+        type: 'integer', // string, float, date
         min: 0,
         max: 10000,
         format: function(val){ },
         validate: function(val){ },
+
+        // datastore: dataStoreOverride
+
+        /* options useful for strings: */
+        // length: 10,
+        // truncate: 10,
+        // format: function(val, config){ }
+
+        // Example custom paramete:
         dataType: 'timer'
       }
     }

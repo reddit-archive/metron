@@ -90,7 +90,7 @@ Parameter.prototype.format = function(){
     val = val.substring(0, config.truncate)
 
   if(config.format)
-    return config.format(val);
+    return config.format(val, config);
 
   return val;
 }
