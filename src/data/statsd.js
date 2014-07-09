@@ -39,20 +39,19 @@ Statsd.prototype.send = function(name, value, config, callback){
   if(!this[config.statsd.eventType])
     return;
 
+  if(config.statsd.sampleRate && Math.random() >= config.statsd.sampleRate)
+    return;
+
   if(this.config.prefix)
     name = this.config.prefix + '.' + name;
 
   var message = this[config.statsd.eventType](name, value);
 
-  if(config.statsd.sampleRate) {
-    if(Math.random() >= config.statsd.sampleRate)
-      return;
-
+  if(config.statsd.sampleRate)
     message += '|@' + config.statsd.sampleRate
-  }
 
   if(config.statsd.tags)
-      message += '|#' + config.statsd.tags.join(',')
+    message += '|#' + config.statsd.tags.join(',')
 
   var buffer = new Buffer(message);
 
