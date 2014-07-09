@@ -50,14 +50,12 @@ describe('Statsd adapter', function() {
     var length = spy.args[0][2];
     var port = spy.args[0][3];
     var host = spy.args[0][4];
-    var callback = spy.args[0][5];
 
     expect(buffer.toString()).to.equal(expectedMessage);
     expect(start).to.equal(0);
     expect(length).to.equal(expectedMessage.length);
     expect(port).to.equal(8125);
     expect(host).to.equal('localhost');
-    expect(callback).to.equal(cb);
   });
 
   it('increments', function(){
@@ -135,12 +133,14 @@ describe('Statsd adapter', function() {
     spy = statsd.socket.send;
 
     statsd.send('test', 1, eventConfig);
-    statsd.send('test', 1, eventConfig);
-
+    statsd.send('test2', 1, eventConfig);
+    var expectedMessage = 'pre.test:1|c\npre.test2:1|c';
     expect(spy).not.called;
 
     setTimeout(function(){
-      expect(spy).calledTwice;
+      expect(spy).calledOnce;
+      var buffer = spy.args[0][0];
+      expect(buffer.toString()).to.equal(expectedMessage);
       done();
     }, 150);
   });
