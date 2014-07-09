@@ -7,7 +7,6 @@ var defaultStatsdConfig = {
   host: 'localhost',
   port: 8125,
   socketTimeout: 1000,
-  debug: false,
   prefix: '',
   preCacheDNS: true
 };
