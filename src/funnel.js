@@ -11,7 +11,7 @@ var defaultConfig = {
 };
 
 function Funnel(config){
-  this.config = {};
+  this.config = config || {};
   this.set(config);
 }
 
@@ -93,7 +93,9 @@ Funnel.prototype.processParameters = function(params, req, res){
       var statValue = new Parameter(segment[statName], statConfig).value();
 
       if(statValue !== undefined){
-        var store = statConfig.dataStore || segmentConfig.dataStore || console.log;
+        var store = statConfig.dataStore ||
+                    segmentConfig.dataStore ||
+                    console.log;
 
         var config = { };
         for(var key in segmentConfig){
@@ -110,6 +112,10 @@ Funnel.prototype.processParameters = function(params, req, res){
   }
 
   this.endRequest(req, res);
+}
+
+Funnel.dataAdapters = {
+  statsd: require('./data/statsd')
 }
 
 module.exports = Funnel;

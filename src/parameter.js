@@ -1,8 +1,6 @@
 /* jshint strict:false */
 
-var defaultConfig = {
-
-};
+var defaultConfig = { };
 
 var conversion = {
   'integer': function(val){
