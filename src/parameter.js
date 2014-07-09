@@ -1,7 +1,5 @@
 /* jshint strict:false */
 
-var defaultConfig = { };
-
 var conversion = {
   'integer': function(val){
      val = parseInt(val);
@@ -37,10 +35,6 @@ var conversion = {
 
 function Parameter(val, config){
   this.config = config || {};
-
-  for(var key in defaultConfig){
-    this.config[key] = config[key] || defaultConfig[key]
-  }
 
   this.val = val;
 

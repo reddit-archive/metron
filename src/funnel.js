@@ -21,7 +21,10 @@ Funnel.prototype.get = function(key){
 
 Funnel.prototype.set = function(obj){
   for(var key in defaultConfig){
-    this.config[key] = obj[key] || this.config[key] || defaultConfig[key];
+    this.config[key] =
+      [obj[key], this.config[key], defaultConfig[key]].filter(function(v){
+        return v !== undefined
+      })[0];
   }
 
   return this.config;

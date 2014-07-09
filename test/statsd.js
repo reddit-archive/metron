@@ -26,12 +26,13 @@ describe('Statsd adapter', function() {
     statsd = new Statsd({
       prefix: 'pre',
       socket: new socketStub(),
-      preCacheDNS: false
+      preCacheDNS: false,
+      bufferTimeout: 0
     });
 
     eventConfig = {
       statsd: {
-        eventType: 'increment'
+        eventType: 'increment',
       }
     };
 
@@ -121,5 +122,26 @@ describe('Statsd adapter', function() {
     var expectedMessage = 'pre.test:1|c|#a,b';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
+  });
+
+  it('works with buffering', function(done){
+    statsd = new Statsd({
+      prefix: 'pre',
+      socket: new socketStub(),
+      preCacheDNS: false,
+      bufferTimeout: 100
+    });
+
+    spy = statsd.socket.send;
+
+    statsd.send('test', 1, eventConfig);
+    statsd.send('test', 1, eventConfig);
+
+    expect(spy).not.called;
+
+    setTimeout(function(){
+      expect(spy).calledTwice;
+      done();
+    }, 150);
   });
 })
