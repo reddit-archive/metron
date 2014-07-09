@@ -20,7 +20,7 @@ function socketStub(config){
 }
 
 describe('Statsd adapter', function() {
-  var statsd, spy;
+  var statsd, spy, eventConfig;
 
   beforeEach(function(){
     statsd = new Statsd({
@@ -29,13 +29,19 @@ describe('Statsd adapter', function() {
       preCacheDNS: false
     });
 
+    eventConfig = {
+      statsd: {
+        eventType: 'increment'
+      }
+    };
+
     spy = statsd.socket.send;
   });
 
   it('sends to the right place', function(){
     var cb = sinon.spy();
 
-    statsd.send('test', 1, { eventType: 'increment' }, cb);
+    statsd.send('test', 1, eventConfig, cb);
     var expectedMessage = 'pre.test:1|c';
 
     var buffer = spy.args[0][0];
@@ -54,43 +60,65 @@ describe('Statsd adapter', function() {
   });
 
   it('increments', function(){
-    statsd.send('test', 1, { eventType: 'increment' });
+    statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|c';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
   it('decrements', function(){
-    statsd.send('test', 1, { eventType: 'decrement' });
+    eventConfig.statsd.eventType = 'decrement';
+
+    statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:-1|c';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
   it('counts', function(){
-    statsd.send('test', 3, { eventType: 'counter' });
+    eventConfig.statsd.eventType = 'counter';
+    statsd.send('test', 3, eventConfig);
     var expectedMessage = 'pre.test:3|c';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
   it('gauges', function(){
-    statsd.send('test', 1, { eventType: 'gauge' });
+    eventConfig.statsd.eventType = 'gauge';
+    statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|g';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
   it('times', function(){
-    statsd.send('test', 500, { eventType: 'timing' });
+    eventConfig.statsd.eventType = 'timing';
+    statsd.send('test', 500, eventConfig);
     var expectedMessage = 'pre.test:500|ms';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
   it('sets', function(){
-    statsd.send('test', 50, { eventType: 'set' });
+    eventConfig.statsd.eventType = 'set';
+    statsd.send('test', 50, eventConfig);
     var expectedMessage = 'pre.test:50|s';
+    var buffer = spy.args[0][0];
+    expect(buffer.toString()).to.equal(expectedMessage);
+  });
+
+  it('applies sampling', function(){
+    eventConfig.statsd.sampleRate = 1.00
+    statsd.send('test', 1, eventConfig);
+    var expectedMessage = 'pre.test:1|c|@1';
+    var buffer = spy.args[0][0];
+    expect(buffer.toString()).to.equal(expectedMessage);
+  });
+
+  it('applies tags', function(){
+    eventConfig.statsd.tags = ['a', 'b'];
+    statsd.send('test', 1, eventConfig);
+    var expectedMessage = 'pre.test:1|c|#a,b';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });

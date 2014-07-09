@@ -34,13 +34,26 @@ Statsd.prototype.stop = function(){
 }
 
 Statsd.prototype.send = function(name, value, config, callback){
-  if(!this[config.eventType])
+  config.statsd = config.statsd || {};
+
+  if(!this[config.statsd.eventType])
     return;
 
   if(this.config.prefix)
     name = this.config.prefix + '.' + name;
 
-  var message = this[config.eventType](name, value);
+  var message = this[config.statsd.eventType](name, value);
+
+  if(config.statsd.sampleRate) {
+    if(Math.random() >= config.statsd.sampleRate)
+      return;
+
+    message += '|@' + config.statsd.sampleRate
+  }
+
+  if(config.statsd.tags)
+      message += '|#' + config.statsd.tags.join(',')
+
   var buffer = new Buffer(message);
 
   this.socket.send(buffer, 0, buffer.length, this.config.port, this.config.host,
