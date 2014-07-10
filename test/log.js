@@ -17,9 +17,11 @@ describe('Log adapter', function() {
   var log, spy, eventConfig;
 
   var req = {
-    host: '127.0.0.1',
-    'user-agent': 'curl/7.22.0',
-    'accept': '*/*'
+    headers: {
+      host: '127.0.0.1',
+      'user-agent': 'curl/7.22.0',
+      'accept': '*/*'
+    }
   };
 
   beforeEach(function(){
@@ -35,7 +37,7 @@ describe('Log adapter', function() {
 
   it('formats logs', function(){
     var shasum = crypto.createHash('sha1');
-    shasum.update(req.host + req['user-agent']);
+    shasum.update(req.headers.host + req.headers['user-agent']);
     var id = shasum.digest('hex');
     var expectation = id + ':\t' + 'test' + '\t' + 1;
 
@@ -52,7 +54,7 @@ describe('Log adapter', function() {
 
   it('uses a custom formatter', function(){
     var shasum = crypto.createHash('sha1');
-    shasum.update(req.host + req['user-agent']);
+    shasum.update(req.headers.host + req.headers['user-agent']);
     var id = shasum.digest('hex');
 
     eventConfig.log.format = sinon.spy()

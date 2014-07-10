@@ -30,10 +30,9 @@ Log.prototype.send = function(name, value, config, req){
       Math.random() >= config.log.sampleRate)
     return;
 
-
   // Generate an id that more or less identifies a user.
-  var userAgent = req['user-agent'] || Math.random().toString();
-  var host = req.host || Math.random().toString();
+  var userAgent = req.headers['user-agent'] || Math.random().toString();
+  var host = req.headers.host || Math.random().toString();
   var id;
 
   var shasum = crypto.createHash('sha1');
