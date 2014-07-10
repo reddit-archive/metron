@@ -6,17 +6,17 @@ var dgram = require('dgram'),
 var defaultStatsdConfig = {
   host: 'localhost',
   port: 8125,
-  socketTimeout: 1000,
+  socketTimeout: 500,
   prefix: '',
   preCacheDNS: true,
-  bufferTimeout: 1000
+  bufferTimeout: 500
 };
 
 function Statsd(config){
   this.config = config || {};
 
   for(var key in defaultStatsdConfig){
-    this.config[key] = 
+    this.config[key] =
       [config[key], defaultStatsdConfig[key]].filter(function(v){
         return v !== undefined
       })[0];
@@ -46,7 +46,8 @@ Statsd.prototype.send = function(name, value, config){
   if(!this[config.statsd.eventType])
     return;
 
-  if(config.statsd.sampleRate && Math.random() >= config.statsd.sampleRate)
+  if(config.statsd.sampleRate !== undefined &&
+      Math.random() >= config.statsd.sampleRate)
     return;
 
   if(this.config.prefix)

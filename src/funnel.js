@@ -93,14 +93,16 @@ Funnel.prototype.processParameters = function(params, req, res){
 
     for(var statName in segment){
       var statConfig = segmentConfig[statName];
-      var statValue = new Parameter(segment[statName], statConfig).value();
+      var statValue = segment[statName];
+      statValue = new Parameter(statValue, statConfig).value();
 
       if(statValue !== undefined){
+        var config = { };
         var store = statConfig.dataStore ||
                     segmentConfig.dataStore ||
                     console.log;
 
-        var config = { };
+
         for(var key in segmentConfig){
           config[key] = segmentConfig[key];
         }
@@ -109,7 +111,7 @@ Funnel.prototype.processParameters = function(params, req, res){
           config[key] = segmentConfig[key];
         }
 
-        store(statName, statValue, config);
+        store(statName, statValue, config, req);
       }
     }
   }
@@ -118,7 +120,8 @@ Funnel.prototype.processParameters = function(params, req, res){
 }
 
 Funnel.dataAdapters = {
-  statsd: require('./data/statsd')
+  statsd: require('./data/statsd'),
+  log: require('./data/log')
 }
 
 module.exports = Funnel;
