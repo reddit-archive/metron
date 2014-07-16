@@ -20,7 +20,7 @@ Your friendly metrics-gathering robot.
 Simple configuration-based web server. Data goes into the metron, and out to
 a data store. As simple as can be.
 
-See [./sample](./sample) for example usage.
+See [./example](./example) for example usage.
 
 The Longer Description
 ======================
