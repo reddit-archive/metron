@@ -92,7 +92,7 @@ Metron.prototype.processParameters = function(params, req, res){
       return this.endRequest(req, res, 422);
 
     for(var statName in segment){
-      var statConfig = segmentConfig[statName];
+      var statConfig = segmentConfig.stats[statName];
       var statValue = segment[statName];
       statValue = new Parameter(statValue, statConfig).value();
 
@@ -102,16 +102,22 @@ Metron.prototype.processParameters = function(params, req, res){
                     segmentConfig.dataStore ||
                     console.log;
 
-
         for(var key in segmentConfig){
-          config[key] = segmentConfig[key];
+          if(key == 'stats') continue;
+          config[key] = statConfig[key];
         }
 
         for(key in statConfig){
-          config[key] = segmentConfig[key];
+          config[key] = statConfig[key];
         }
 
-        store(statName, statValue, config, req);
+        if(typeof store === 'function'){
+          store(statName, statValue, config, req);
+        }else if(typeof store === 'object'){
+          store.forEach(function(s){
+            s(statName, statValue, config, req);
+          });
+        }
       }
     }
   }
@@ -120,8 +126,8 @@ Metron.prototype.processParameters = function(params, req, res){
 }
 
 Metron.dataAdapters = {
-  statsd: require('./data/statsd'),
-  log: require('./data/log')
+  Statsd: require('./data/statsd'),
+  Log: require('./data/log')
 }
 
 module.exports = Metron;

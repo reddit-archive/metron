@@ -73,10 +73,12 @@ describe('Metron server', function(){
     var metronConfig = {
       segments: {
         rum: {
-         totalLoadTime: {
-           type: 'integer',
-           dataStore: sinon.spy()
-         }
+          stats: {
+            totalLoadTime: {
+              type: 'integer',
+              dataStore: sinon.spy()
+            }
+          }
         }
       }
     };
@@ -89,11 +91,44 @@ describe('Metron server', function(){
     http.get('http://127.0.0.1:' + config.port + params, function(res){
       expect(res.statusCode).to.equal(204);
 
-      expect(metronConfig.segments.rum.totalLoadTime.dataStore)
+      expect(metronConfig.segments.rum.stats.totalLoadTime.dataStore)
         .calledWith('totalLoadTime', 1000);
 
       done();
     });
   });
+
+  it('logs data specified in the Metron config to multiple stores', function(done){
+    var metronConfig = {
+      segments: {
+        rum: {
+          stats: {
+            totalLoadTime: {
+              type: 'integer',
+              dataStore: [sinon.spy(), sinon.spy()]
+            }
+          }
+        }
+      }
+    };
+
+    metron.set(metronConfig);
+
+    var data = JSON.stringify({ rum: { totalLoadTime: 1000 }  });
+    var params = '?data=' + qs.escape(data);
+
+    http.get('http://127.0.0.1:' + config.port + params, function(res){
+      expect(res.statusCode).to.equal(204);
+
+      expect(metronConfig.segments.rum.stats.totalLoadTime.dataStore[0])
+        .calledWith('totalLoadTime', 1000);
+
+      expect(metronConfig.segments.rum.stats.totalLoadTime.dataStore[1])
+        .calledWith('totalLoadTime', 1000);
+
+      done();
+    });
+  });
+
 });
 
