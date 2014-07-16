@@ -1,7 +1,7 @@
 /* jshint strict:false */
 /* global describe,it,beforeEach,afterEach */
 
-var Funnel = require('../src/funnel'),
+var Metron = require('../src/metron'),
     sinon = require('sinon'),
     chai = require('chai'),
     expect = require('chai').expect,
@@ -13,43 +13,43 @@ require('sinon-mocha').enhance(sinon);
 var http = require('http');
 var qs = require('querystring');
 
-describe('Funnel', function() {
+describe('Metron', function() {
   var config = {
     port: 80
   }
 
   it('initializes with config', function(){
-    var funnel = new Funnel(config)
-    expect(funnel.get('port')).to.equal(80);
+    var metron = new Metron(config)
+    expect(metron.get('port')).to.equal(80);
   });
 
   it('can get config values', function(){
-    var funnel = new Funnel(config)
-    expect(funnel.get('port')).to.equal(funnel.config.port);
+    var metron = new Metron(config)
+    expect(metron.get('port')).to.equal(metron.config.port);
   });
 
   it('can set config values', function(){
-    var funnel = new Funnel(config)
+    var metron = new Metron(config)
 
-    funnel.set({ port: 8080 });
-    expect(funnel.get('port')).to.equal(8080);
+    metron.set({ port: 8080 });
+    expect(metron.get('port')).to.equal(8080);
   });
 });
 
-describe('Funnel server', function(){
+describe('Metron server', function(){
   var config = {
     port: 8080
   };
 
-  var funnel;
+  var metron;
 
   beforeEach(function(){
-    funnel = new Funnel(config);
-    funnel.start();
+    metron = new Metron(config);
+    metron.start();
   });
 
   afterEach(function(){
-    funnel.stop();
+    metron.stop();
   });
 
   it('starts a server', function(done){
@@ -69,8 +69,8 @@ describe('Funnel server', function(){
     });
   });
 
-  it('logs data specified in the Funnel config', function(done){
-    var funnelConfig = {
+  it('logs data specified in the Metron config', function(done){
+    var metronConfig = {
       segments: {
         rum: {
          totalLoadTime: {
@@ -81,7 +81,7 @@ describe('Funnel server', function(){
       }
     };
 
-    funnel.set(funnelConfig);
+    metron.set(metronConfig);
 
     var data = JSON.stringify({ rum: { totalLoadTime: 1000 }  });
     var params = '?data=' + qs.escape(data);
@@ -89,7 +89,7 @@ describe('Funnel server', function(){
     http.get('http://127.0.0.1:' + config.port + params, function(res){
       expect(res.statusCode).to.equal(204);
 
-      expect(funnelConfig.segments.rum.totalLoadTime.dataStore)
+      expect(metronConfig.segments.rum.totalLoadTime.dataStore)
         .calledWith('totalLoadTime', 1000);
 
       done();

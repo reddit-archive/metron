@@ -1,14 +1,14 @@
 {
-  "name": "funnel",
+  "name": "metron",
   "version": "0.0.1",
   "description": "simple whitelisted statsd passthrough.",
-  "main": "src/funnel.js",
+  "main": "src/metron.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ajacksified/funnel.git"
+    "url": "https://github.com/ajacksified/metron.git"
   },
   "keywords": [
     "statsd"
@@ -16,9 +16,9 @@
   "author": "Jack Lawson <ajacksified@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ajacksified/funnel/issues"
+    "url": "https://github.com/ajacksified/metron/issues"
   },
-  "homepage": "https://github.com/ajacksified/funnel",
+  "homepage": "https://github.com/ajacksified/metron",
   "devDependencies": {
     "chai": "^1.9.1",
     "mocha": "^1.20.1",

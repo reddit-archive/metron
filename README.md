@@ -1,9 +1,23 @@
-funnel
+metron
 ======
 
-[![travis-ci status](https://travis-ci.org/ajacksified/funnel.svg)](http://travis-ci.org/ajacksified/funnel)
+Your friendly metrics-gathering robot.
 
-Simple configuration-based web server. Data goes into the funnel, and out to
+```
+      ,     ,
+     (\____/)  Store the things
+      (_oo_)  /
+        (O)  /
+      __||__    \)
+   []/______\[] /
+   / \______/ \/
+  /    /__\
+ (\   /____\
+```
+
+[![travis-ci status](https://travis-ci.org/ajacksified/metron.svg)](http://travis-ci.org/ajacksified/metron)
+
+Simple configuration-based web server. Data goes into the metron, and out to
 a data store. As simple as can be.
 
 See [./sample](./sample) for example usage.
@@ -21,7 +35,7 @@ of stats, and set up a data storage adapter for those stats. (For browser perf
 data, you might just have it go to statsd; for experiments, you might use
 Hive or something else.)
 
-How to Use Funnel
+How to Use Metron
 =================
 
 Create a configuration file.
@@ -39,7 +53,7 @@ var statsdStore = function(name, val, config){
 /* end statsd pseudocode */
 
 var config = {
-  // The port to run the funnel server on
+  // The port to run the metron server on
   port: 8000,
 
   // The list of data segments to store. A segment is way to categorize
@@ -84,12 +98,12 @@ module.exports = config;
 I could write a `server.js` like:
 
 ```javascript
-var Funnel = require('funnel');
-var funnel = new Funnel(require('./config'));
+var Metron = require('metron');
+var metron = new Metron(require('./config'));
 
-funnel.start();
+metron.start();
 
-console.log('server started at ' + funnel.get('port'));
+console.log('server started at ' + metron.get('port'));
 ```
 
 I could then POST json data (or GET, using a `?data=<json>` querystring) to
@@ -107,7 +121,7 @@ Which would then, in our example, use our `statsdStore` to send data.
 Notes
 =====
 
-Funnel doesn't currently deal with rate limiting, so you may want to stick an
+Metron doesn't currently deal with rate limiting, so you may want to stick an
 nginx in front to handle being hammered. You're also on your own for
 implementing data adapters; you may want to batch multiple stat requests from a
 single request as well.
