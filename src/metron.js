@@ -47,12 +47,11 @@ Metron.prototype.processRequest = function(req, res){
 
   if(req.method === 'GET'){
     try{
-      params = JSON.parse(parsedUrl.query.data);
+      req.params = JSON.parse(parsedUrl.query.data);
+      this.processParameters(req, res);
     }catch(e){
       return this.endRequest(req, res, 400);
     }
-
-    this.processParameters(params, req, res);
   }else{
     var body = [];
 
@@ -70,10 +69,9 @@ Metron.prototype.processRequest = function(req, res){
           return this.endRequest(req, res, 400);
         }
       }else{
-        params = qs.parse(body);
+        req.params = qs.parse(body);
+        this.processParameters(req, res);
       }
-
-      this.processParameters(params, req, res);
     });
   }
 }
@@ -83,7 +81,9 @@ Metron.prototype.endRequest = function(req, res, statusCode){
   res.end();
 };
 
-Metron.prototype.processParameters = function(params, req, res){
+Metron.prototype.processParameters = function(req, res){
+  var params = req.params;
+
   for(var segmentName in params){
     var segmentConfig = this.config.segments[segmentName];
     var segment = params[segmentName];

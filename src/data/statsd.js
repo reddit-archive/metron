@@ -40,7 +40,7 @@ Statsd.prototype.stop = function(){
   this.socket.close();
 }
 
-Statsd.prototype.send = function(name, value, config){
+Statsd.prototype.send = function(name, value, config, req){
   config.statsd = config.statsd || {};
 
   if(!this[config.statsd.eventType])
@@ -48,6 +48,18 @@ Statsd.prototype.send = function(name, value, config){
 
   if(config.statsd.sampleRate !== undefined &&
       Math.random() >= config.statsd.sampleRate)
+    return;
+
+  if(this.config.formatName)
+    name = this.config.formatName(name, value, config, req);
+
+  if(name === undefined)
+    return;
+
+  if(this.config.formatValue)
+    value = this.config.formatName(name, value, config, req);
+
+  if(value === undefined)
     return;
 
   if(this.config.prefix)

@@ -5,7 +5,7 @@ var conversion = {
      val = parseInt(val);
 
      if(isNaN(val))
-        return undefined;
+        return;
 
      return val;
   },
@@ -13,7 +13,7 @@ var conversion = {
      val = parseFloat(val);
 
      if(isNaN(val))
-        return undefined;
+        return;
 
      return val;
   },
@@ -27,7 +27,7 @@ var conversion = {
       date = new Date(parseInt(val));
 
     if(isNaN(date.getTime()))
-      return undefined;
+      return;
 
     return date;
   }
@@ -60,13 +60,13 @@ Parameter.prototype.validate = function(){
   var config = this.config;
 
   if(config.max !== undefined && val > config.max)
-    return undefined;
+    return;
 
   if(config.min !== undefined && val < config.min)
-    return undefined;
+    return;
 
   if(config.length !== undefined && val.length > config.length)
-    return undefined;
+    return;
 
   if(!config.validate)
     return val;
