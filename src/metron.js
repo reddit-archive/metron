@@ -10,16 +10,16 @@ var defaultConfig = {
   port: 8000
 };
 
-function Funnel(config){
+function Metron(config){
   this.config = config || {};
   this.set(config);
 }
 
-Funnel.prototype.get = function(key){
+Metron.prototype.get = function(key){
   return this.config[key];
 }
 
-Funnel.prototype.set = function(obj){
+Metron.prototype.set = function(obj){
   for(var key in defaultConfig){
     this.config[key] =
       [obj[key], this.config[key], defaultConfig[key]].filter(function(v){
@@ -30,18 +30,18 @@ Funnel.prototype.set = function(obj){
   return this.config;
 }
 
-Funnel.prototype.start = function(){
+Metron.prototype.start = function(){
   var server  = http.createServer(this.processRequest.bind(this));
   this.server = server;
 
   server.listen(this.get('port'));
 }
 
-Funnel.prototype.stop = function(){
+Metron.prototype.stop = function(){
   this.server.close();
 }
 
-Funnel.prototype.processRequest = function(req, res){
+Metron.prototype.processRequest = function(req, res){
   var params = { };
   var parsedUrl = url.parse(req.url, true);
 
@@ -78,12 +78,12 @@ Funnel.prototype.processRequest = function(req, res){
   }
 }
 
-Funnel.prototype.endRequest = function(req, res, statusCode){
+Metron.prototype.endRequest = function(req, res, statusCode){
   res.writeHead(statusCode || 204);
   res.end();
 };
 
-Funnel.prototype.processParameters = function(params, req, res){
+Metron.prototype.processParameters = function(params, req, res){
   for(var segmentName in params){
     var segmentConfig = this.config.segments[segmentName];
     var segment = params[segmentName];
@@ -119,9 +119,9 @@ Funnel.prototype.processParameters = function(params, req, res){
   this.endRequest(req, res);
 }
 
-Funnel.dataAdapters = {
+Metron.dataAdapters = {
   statsd: require('./data/statsd'),
   log: require('./data/log')
 }
 
-module.exports = Funnel;
+module.exports = Metron;
