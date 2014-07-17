@@ -78,6 +78,7 @@ Metron.prototype.processRequest = function(req, res){
 }
 
 Metron.prototype.endRequest = function(req, res, statusCode){
+  req.ended = true;
   res.writeHead(statusCode || 204);
   res.end();
 };
@@ -87,6 +88,8 @@ Metron.prototype.processParameters = function(req, res){
 
   for(var i = 0; i < this.middleware.length; i++){
     this.middleware[i](req, res);
+    // return early if one of the middlewares ended the request.
+    if(req.ended) return;
   }
 
   for(var segmentName in params){
