@@ -10,8 +10,9 @@ var defaultConfig = {
   port: 8000
 };
 
-function Metron(config){
+function Metron(config, middleware){
   this.config = config || {};
+  this.middleware = middleware || [];
   this.set(config);
 }
 
@@ -83,6 +84,10 @@ Metron.prototype.endRequest = function(req, res, statusCode){
 
 Metron.prototype.processParameters = function(req, res){
   var params = req.params;
+
+  for(var i = 0; i < this.middleware.length; i++){
+    this.middleware[i](req, res);
+  }
 
   for(var segmentName in params){
     var segmentConfig = this.config.segments[segmentName];
