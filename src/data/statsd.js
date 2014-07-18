@@ -1,7 +1,7 @@
 /* jshint strict:false */
 
-var dgram = require('dgram'),
-    dns = require('dns');
+var dgram = require('dgram');
+var dns = require('dns');
 
 var defaultStatsdConfig = {
   host: 'localhost',
@@ -12,20 +12,20 @@ var defaultStatsdConfig = {
   bufferTimeout: 500
 };
 
-function Statsd(config){
+function Statsd(config) {
   this.config = config || {};
 
-  for(var key in defaultStatsdConfig){
+  for(var key in defaultStatsdConfig) {
     this.config[key] =
-      [config[key], defaultStatsdConfig[key]].filter(function(v){
+      [config[key], defaultStatsdConfig[key]].filter(function(v) {
         return v !== undefined
       })[0];
   }
 
 
-  if(this.config.preCacheDNS){
-    dns.lookup(config.host, (function(err, addr){
-      if(!err){
+  if (this.config.preCacheDNS) {
+    dns.lookup(config.host, (function(err, addr) {
+      if (!err) {
         this.config.host = addr;
       }
     }).bind(this));
@@ -36,41 +36,41 @@ function Statsd(config){
   this.socket = this.config.socket || dgram.createSocket('udp4');
 }
 
-Statsd.prototype.stop = function(){
+Statsd.prototype.stop = function() {
   this.socket.close();
 }
 
-Statsd.prototype.send = function(name, value, config, req){
+Statsd.prototype.send = function(name, value, config, req) {
   config.statsd = config.statsd || {};
 
-  if(!this[config.statsd.eventType])
+  if (!this[config.statsd.eventType])
     return;
 
-  if(config.statsd.sampleRate !== undefined &&
+  if (config.statsd.sampleRate !== undefined &&
       Math.random() >= config.statsd.sampleRate)
     return;
 
-  if(this.config.statsd.formatName)
+  if (config.statsd.formatName)
     name = this.config.formatName(name, value, config, req);
 
-  if(name === undefined)
+  if (name === undefined)
     return;
 
-  if(this.config.statsd.formatValue)
+  if (config.statsd.formatValue)
     value = this.config.formatValue(name, value, config, req);
 
-  if(value === undefined)
+  if (value === undefined)
     return;
 
-  if(this.config.prefix)
+  if (this.config.prefix)
     name = this.config.prefix + '.' + name;
 
   var message = this[config.statsd.eventType](name, value);
 
-  if(config.statsd.sampleRate)
+  if (config.statsd.sampleRate)
     message += '|@' + config.statsd.sampleRate
 
-  if(config.statsd.tags)
+  if (config.statsd.tags)
     message += '|#' + config.statsd.tags.join(',')
 
   this.buffer.push(message);
@@ -78,12 +78,12 @@ Statsd.prototype.send = function(name, value, config, req){
   this.flushBuffer();
 }
 
-Statsd.prototype.flushBuffer = function(){
-  if(!this.config.bufferTimeout){
-    this.buffer.forEach((function(b){
+Statsd.prototype.flushBuffer = function() {
+  if (!this.config.bufferTimeout) {
+    this.buffer.forEach((function(b) {
       var buffer = new Buffer(b);
       this.socket.send(buffer, 0, buffer.length, this.config.port,
-        this.config.host, function(){});
+        this.config.host, function() {});
     }).bind(this));
 
     this.buffer = [];
@@ -92,46 +92,46 @@ Statsd.prototype.flushBuffer = function(){
   var now = new Date();
 
   // If it's been a second, go ahead and flush and clear the timeout.
-  if(now - this.lastFlush > this.config.bufferTimeout){
+  if (now - this.lastFlush > this.config.bufferTimeout) {
     clearTimeout(this.bufferTimeout);
     this.bufferTimeout = null;
       var buffer = new Buffer(this.buffer.join('\n'));
       this.socket.send(buffer, 0, buffer.length, this.config.port,
-        this.config.host, function(){});
+        this.config.host, function() {});
   } else {
     // If it hasn't been a second, and there's no delayed call, create one
     // so everything gets flushed after a second.
-    if(!this.bufferTimeout){
+    if (!this.bufferTimeout) {
       this.bufferTimeout = setTimeout(this.flushBuffer.bind(this),
           this.config.bufferTimeout);
     }
   }
 }
 
-Statsd.prototype.counter = function(name, value){
+Statsd.prototype.counter = function(name, value) {
   value = name + ':' + value + '|c';
   return value;
 }
 
-Statsd.prototype.increment = function(name, value){
+Statsd.prototype.increment = function(name, value) {
   return this.counter(name, value || 1);
 }
 
-Statsd.prototype.decrement = function(name, value){
+Statsd.prototype.decrement = function(name, value) {
   return this.counter(name, -value || -1);
 }
 
-Statsd.prototype.gauge = function(name, value){
+Statsd.prototype.gauge = function(name, value) {
   value = name + ':' + value + '|g';
   return value;
 }
 
-Statsd.prototype.timing = function(name, value){
+Statsd.prototype.timing = function(name, value) {
   value = name + ':' + value + '|ms';
   return value;
 }
 
-Statsd.prototype.set = function(name, value){
+Statsd.prototype.set = function(name, value) {
   value = name + ':' + value + '|s';
   return value;
 }

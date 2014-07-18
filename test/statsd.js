@@ -1,17 +1,17 @@
 /* jshint strict:false */
 /* global describe,it,beforeEach */
 
-var Statsd = require('../src/data/statsd'),
-    sinon = require('sinon'),
-    chai = require('chai'),
-    expect = require('chai').expect,
-    sinonChai = require('sinon-chai');
+var Statsd = require('../src/data/statsd');
+var sinon = require('sinon');
+var chai = require('chai');
+var expect = require('chai').expect;
+var sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
 require('sinon-mocha').enhance(sinon);
 
-function socketStub(config){
-  for(var key in config){
+function socketStub(config) {
+  for(var key in config) {
     this[key] = config[key];
   }
 
@@ -20,9 +20,11 @@ function socketStub(config){
 }
 
 describe('Statsd adapter', function() {
-  var statsd, spy, eventConfig;
+  var statsd;
+  var spy;
+  var eventConfig;
 
-  beforeEach(function(){
+  beforeEach(function() {
     statsd = new Statsd({
       prefix: 'pre',
       socket: new socketStub(),
@@ -39,7 +41,7 @@ describe('Statsd adapter', function() {
     spy = statsd.socket.send;
   });
 
-  it('sends to the right place', function(){
+  it('sends to the right place', function() {
     var cb = sinon.spy();
 
     statsd.send('test', 1, eventConfig, cb);
@@ -58,14 +60,14 @@ describe('Statsd adapter', function() {
     expect(host).to.equal('localhost');
   });
 
-  it('increments', function(){
+  it('increments', function() {
     statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|c';
     var buffer = spy.args[0][0];
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('decrements', function(){
+  it('decrements', function() {
     eventConfig.statsd.eventType = 'decrement';
 
     statsd.send('test', 1, eventConfig);
@@ -74,7 +76,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('counts', function(){
+  it('counts', function() {
     eventConfig.statsd.eventType = 'counter';
     statsd.send('test', 3, eventConfig);
     var expectedMessage = 'pre.test:3|c';
@@ -82,7 +84,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('gauges', function(){
+  it('gauges', function() {
     eventConfig.statsd.eventType = 'gauge';
     statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|g';
@@ -90,7 +92,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('times', function(){
+  it('times', function() {
     eventConfig.statsd.eventType = 'timing';
     statsd.send('test', 500, eventConfig);
     var expectedMessage = 'pre.test:500|ms';
@@ -98,7 +100,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('sets', function(){
+  it('sets', function() {
     eventConfig.statsd.eventType = 'set';
     statsd.send('test', 50, eventConfig);
     var expectedMessage = 'pre.test:50|s';
@@ -106,7 +108,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('applies sampling', function(){
+  it('applies sampling', function() {
     eventConfig.statsd.sampleRate = 1.00
     statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|c|@1';
@@ -114,7 +116,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('applies tags', function(){
+  it('applies tags', function() {
     eventConfig.statsd.tags = ['a', 'b'];
     statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|c|#a,b';
@@ -122,7 +124,7 @@ describe('Statsd adapter', function() {
     expect(buffer.toString()).to.equal(expectedMessage);
   });
 
-  it('works with buffering', function(done){
+  it('works with buffering', function(done) {
     statsd = new Statsd({
       prefix: 'pre',
       socket: new socketStub(),
@@ -137,7 +139,7 @@ describe('Statsd adapter', function() {
     var expectedMessage = 'pre.test:1|c\npre.test2:1|c';
     expect(spy).not.called;
 
-    setTimeout(function(){
+    setTimeout(function() {
       expect(spy).calledOnce;
       var buffer = spy.args[0][0];
       expect(buffer.toString()).to.equal(expectedMessage);

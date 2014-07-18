@@ -1,16 +1,16 @@
 /* jshint strict:false */
 var crypto = require('crypto');
 
-function Log(config){
+function Log(config) {
   var defaultLogConfig = {
     log: console.log
   };
 
   this.config = config || {};
 
-  for(var key in defaultLogConfig){
+  for(var key in defaultLogConfig) {
     this.config[key] =
-      [config[key], defaultLogConfig[key]].filter(function(v){
+      [config[key], defaultLogConfig[key]].filter(function(v) {
         return v !== undefined
       })[0];
   }
@@ -18,30 +18,30 @@ function Log(config){
   this.send = this.send.bind(this);
 }
 
-Log.prototype.format = function(name, value, config, id){
+Log.prototype.format = function(name, value, config, id) {
   var format = config.log.format || this.config.format;
 
-  if(format)
+  if (format)
     return format(name, value, config, id);
 
   return id + ':\t' + name + '\t' + value;
 }
 
-Log.prototype.send = function(name, value, config, req){
-  if(config.log.sampleRate !== undefined && 
+Log.prototype.send = function(name, value, config, req) {
+  if (config.log.sampleRate !== undefined && 
       Math.random() >= config.log.sampleRate)
     return;
 
-  if(config.log.formatName)
+  if (config.log.formatName)
     name = config.log.formatName(name, value, config, req);
 
-  if(name === undefined)
+  if (name === undefined)
     return;
 
-  if(config.log.formatValue)
+  if (config.log.formatValue)
     value = config.log.formatValue(name, value, config, req);
 
-  if(value === undefined)
+  if (value === undefined)
     return;
 
   // Generate an id that more or less identifies a user.

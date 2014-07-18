@@ -1,11 +1,11 @@
 /* jshint strict:false */
 /* global describe,it,beforeEach */
 
-var Log = require('../src/data/log'),
-    sinon = require('sinon'),
-    chai = require('chai'),
-    expect = require('chai').expect,
-    sinonChai = require('sinon-chai');
+var Log = require('../src/data/log');
+var sinon = require('sinon');
+var chai = require('chai');
+var expect = require('chai').expect;
+var sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
 require('sinon-mocha').enhance(sinon);
@@ -14,7 +14,9 @@ var crypto = require('crypto');
 var shasum = crypto.createHash('sha1');
 
 describe('Log adapter', function() {
-  var log, spy, eventConfig;
+  var log;
+  var spy;
+  var eventConfig;
 
   var req = {
     headers: {
@@ -24,7 +26,7 @@ describe('Log adapter', function() {
     }
   };
 
-  beforeEach(function(){
+  beforeEach(function() {
     log = new Log({
       log: sinon.spy()
     });
@@ -35,7 +37,7 @@ describe('Log adapter', function() {
     };
   });
 
-  it('formats logs', function(){
+  it('formats logs', function() {
     var shasum = crypto.createHash('sha1');
     shasum.update(req.headers.host + req.headers['user-agent']);
     var id = shasum.digest('hex');
@@ -46,13 +48,13 @@ describe('Log adapter', function() {
     expect(log.config.log).to.be.calledWith(expectation);
   });
 
-  it('applies sampling', function(){
+  it('applies sampling', function() {
     eventConfig.log.sampleRate = 0
     log.send('test', 1, eventConfig, req);
     expect(log.config.log.args.length).to.equal(0);
   });
 
-  it('uses a custom formatter', function(){
+  it('uses a custom formatter', function() {
     var shasum = crypto.createHash('sha1');
     shasum.update(req.headers.host + req.headers['user-agent']);
     var id = shasum.digest('hex');
