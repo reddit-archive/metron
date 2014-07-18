@@ -14,6 +14,8 @@ function Log(config){
         return v !== undefined
       })[0];
   }
+
+  this.send = this.send.bind(this);
 }
 
 Log.prototype.format = function(name, value, config, id){
@@ -28,6 +30,18 @@ Log.prototype.format = function(name, value, config, id){
 Log.prototype.send = function(name, value, config, req){
   if(config.log.sampleRate !== undefined && 
       Math.random() >= config.log.sampleRate)
+    return;
+
+  if(config.log.formatName)
+    name = config.log.formatName(name, value, config, req);
+
+  if(name === undefined)
+    return;
+
+  if(config.log.formatValue)
+    value = config.log.formatValue(name, value, config, req);
+
+  if(value === undefined)
     return;
 
   // Generate an id that more or less identifies a user.

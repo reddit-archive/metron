@@ -50,14 +50,14 @@ Statsd.prototype.send = function(name, value, config, req){
       Math.random() >= config.statsd.sampleRate)
     return;
 
-  if(this.config.formatName)
+  if(this.config.statsd.formatName)
     name = this.config.formatName(name, value, config, req);
 
   if(name === undefined)
     return;
 
-  if(this.config.formatValue)
-    value = this.config.formatName(name, value, config, req);
+  if(this.config.statsd.formatValue)
+    value = this.config.formatValue(name, value, config, req);
 
   if(value === undefined)
     return;

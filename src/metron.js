@@ -10,9 +10,8 @@ var defaultConfig = {
   port: 8000
 };
 
-function Metron(config, middleware){
+function Metron(config){
   this.config = config || {};
-  this.middleware = middleware || [];
   this.set(config);
 }
 
@@ -47,11 +46,15 @@ Metron.prototype.processRequest = function(req, res){
   var parsedUrl = url.parse(req.url, true);
 
   if(req.method === 'GET'){
+    if(!parsedUrl.query || !parsedUrl.query.data){
+      return this.endRequest(req, res, 400);
+    }
+
     try{
       req.params = JSON.parse(parsedUrl.query.data);
       this.processParameters(req, res);
     }catch(e){
-      return this.endRequest(req, res, 400);
+      return this.endRequest(req, res, 400, e);
     }
   }else{
     var body = [];
@@ -67,7 +70,7 @@ Metron.prototype.processRequest = function(req, res){
         try{
           params = JSON.parse(body);
         }catch(e){
-          return this.endRequest(req, res, 400);
+          return this.endRequest(req, res, 400, e);
         }
       }else{
         req.params = qs.parse(body);
@@ -77,7 +80,13 @@ Metron.prototype.processRequest = function(req, res){
   }
 }
 
-Metron.prototype.endRequest = function(req, res, statusCode){
+Metron.prototype.endRequest = function(req, res, statusCode, error){
+  if(error && this.config.debug){
+    console.log('ERROR:');
+    console.log(req.params);
+    console.log(error);
+  }
+
   req.ended = true;
   res.writeHead(statusCode || 204);
   res.end();
@@ -86,8 +95,8 @@ Metron.prototype.endRequest = function(req, res, statusCode){
 Metron.prototype.processParameters = function(req, res){
   var params = req.params;
 
-  for(var i = 0; i < this.middleware.length; i++){
-    this.middleware[i](req, res);
+  for(var i = 0; i < this.config.middleware.length; i++){
+    this.config.middleware[i](req, res, this);
     // return early if one of the middlewares ended the request.
     if(req.ended) return;
   }
@@ -102,10 +111,12 @@ Metron.prototype.processParameters = function(req, res){
     for(var statName in segment){
       var statConfig = segmentConfig.stats[statName];
       var statValue = segment[statName];
+
       statValue = new Parameter(statValue, statConfig).value();
 
       if(statValue !== undefined){
         var config = { };
+
         var store = statConfig.dataStore ||
                     segmentConfig.dataStore ||
                     console.log;
