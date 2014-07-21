@@ -125,7 +125,7 @@ Metron.prototype.processParameters = function(req, res) {
 
         for(var key in segmentConfig) {
           if (key == 'stats') continue;
-          config[key] = statConfig[key];
+          config[key] = segmentConfig[key];
         }
 
         for(key in statConfig) {

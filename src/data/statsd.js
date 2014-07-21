@@ -31,6 +31,8 @@ function Statsd(config) {
     }).bind(this));
   }
 
+  this.send = this.send.bind(this);
+
   this.lastFlush = new Date();
   this.buffer = [];
   this.socket = this.config.socket || dgram.createSocket('udp4');
@@ -51,13 +53,13 @@ Statsd.prototype.send = function(name, value, config, req) {
     return;
 
   if (config.statsd.formatName)
-    name = this.config.formatName(name, value, config, req);
+    name = config.statsd.formatName(name, value, config, req);
 
   if (name === undefined)
     return;
 
   if (config.statsd.formatValue)
-    value = this.config.formatValue(name, value, config, req);
+    value = config.statsd.formatValue(name, value, config, req);
 
   if (value === undefined)
     return;
