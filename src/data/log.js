@@ -1,20 +1,13 @@
 /* jshint strict:false */
 var crypto = require('crypto');
+var utils = require('../utils');
+
+var defaultLogConfig = {
+  log: console.log
+};
 
 function Log(config) {
-  var defaultLogConfig = {
-    log: console.log
-  };
-
-  this.config = config || {};
-
-  for(var key in defaultLogConfig) {
-    this.config[key] =
-      [config[key], defaultLogConfig[key]].filter(function(v) {
-        return v !== undefined
-      })[0];
-  }
-
+  this.config = utils.merge({}, defaultLogConfig, config);
   this.send = this.send.bind(this);
 }
 

@@ -2,6 +2,7 @@
 
 var dgram = require('dgram');
 var dns = require('dns');
+var utils = require('../utils')
 
 var defaultStatsdConfig = {
   host: 'localhost',
@@ -13,15 +14,7 @@ var defaultStatsdConfig = {
 };
 
 function Statsd(config) {
-  this.config = config || {};
-
-  for(var key in defaultStatsdConfig) {
-    this.config[key] =
-      [config[key], defaultStatsdConfig[key]].filter(function(v) {
-        return v !== undefined
-      })[0];
-  }
-
+  this.config = utils.merge({}, defaultStatsdConfig, config);
 
   if (this.config.preCacheDNS) {
     dns.lookup(config.host, (function(err, addr) {
