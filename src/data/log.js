@@ -14,28 +14,34 @@ function Log(config) {
 Log.prototype.format = function(name, value, config, id) {
   var format = config.log.format || this.config.format;
 
-  if (format)
+  if (format) {
     return format(name, value, config, id);
+  }
 
   return id + ':\t' + name + '\t' + value;
 }
 
 Log.prototype.send = function(name, value, config, req) {
   if (config.log.sampleRate !== undefined && 
-      Math.random() >= config.log.sampleRate)
+      Math.random() >= config.log.sampleRate) {
     return;
+  }
 
-  if (config.log.formatName)
+  if (config.log.formatName) {
     name = config.log.formatName(name, value, config, req);
+  }
 
-  if (name === undefined)
+  if (name === undefined) {
     return;
+  }
 
-  if (config.log.formatValue)
+  if (config.log.formatValue) {
     value = config.log.formatValue(name, value, config, req);
+  }
 
-  if (value === undefined)
+  if (value === undefined) {
     return;
+  }
 
   // Generate an id that more or less identifies a user.
   var userAgent = req.headers['user-agent'] || Math.random().toString();

@@ -4,16 +4,18 @@ var conversion = {
   'integer': function(val) {
      val = parseInt(val);
 
-     if (isNaN(val))
+     if (isNaN(val)) {
         return;
+     }
 
      return val;
   },
   'float': function(val) {
      val = parseFloat(val);
 
-     if (isNaN(val))
+     if (isNaN(val)) {
         return;
+     }
 
      return val;
   },
@@ -23,11 +25,13 @@ var conversion = {
   'date': function(val) {
     var date = new Date(val);
 
-    if (isNaN(date.getTime()))
+    if (isNaN(date.getTime())) {
       date = new Date(parseInt(val));
+    }
 
-    if (isNaN(date.getTime()))
+    if (isNaN(date.getTime())) {
       return;
+    }
 
     return date;
   }
@@ -59,17 +63,21 @@ Parameter.prototype.validate = function() {
   var val = this.val;
   var config = this.config;
 
-  if (config.max !== undefined && val > config.max)
+  if (config.max !== undefined && val > config.max) {
     return;
+  }
 
-  if (config.min !== undefined && val < config.min)
+  if (config.min !== undefined && val < config.min) {
     return;
+  }
 
-  if (config.length !== undefined && val.length > config.length)
+  if (config.length !== undefined && val.length > config.length) {
     return;
+  }
 
-  if (!config.validate)
+  if (!config.validate) {
     return val;
+  }
 
   return config.validate(val);
 }
@@ -78,11 +86,13 @@ Parameter.prototype.format = function() {
   var val = this.val;
   var config = this.config;
 
-  if (config.truncate)
+  if (config.truncate) {
     val = val.substring(0, config.truncate)
+  }
 
-  if (config.format)
+  if (config.format) {
     return config.format(val, config);
+  }
 
   return val;
 }

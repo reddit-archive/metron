@@ -101,8 +101,9 @@ Metron.prototype.processParameters = function(req, res) {
     var segmentConfig = this.config.segments[segmentName];
     var segment = params[segmentName];
 
-    if (!segmentConfig)
+    if (!segmentConfig) {
       return this.endRequest(req, res, 422);
+    }
 
     for (var statName in segment) {
       var statConfig = segmentConfig.stats[statName];

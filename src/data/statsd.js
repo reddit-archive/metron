@@ -38,35 +38,44 @@ Statsd.prototype.stop = function() {
 Statsd.prototype.send = function(name, value, config, req) {
   config.statsd = config.statsd || {};
 
-  if (!this[config.statsd.eventType])
+  if (!this[config.statsd.eventType]) {
     return;
+  }
 
   if (config.statsd.sampleRate !== undefined &&
-      Math.random() >= config.statsd.sampleRate)
+      Math.random() >= config.statsd.sampleRate) {
     return;
+  }
 
-  if (config.statsd.formatName)
+  if (config.statsd.formatName) {
     name = config.statsd.formatName(name, value, config, req);
+  }
 
-  if (name === undefined)
+  if (name === undefined) {
     return;
+  }
 
-  if (config.statsd.formatValue)
+  if (config.statsd.formatValue) {
     value = config.statsd.formatValue(name, value, config, req);
+  }
 
-  if (value === undefined)
+  if (value === undefined) {
     return;
+  }
 
-  if (this.config.prefix)
+  if (this.config.prefix) {
     name = this.config.prefix + '.' + name;
+  }
 
   var message = this[config.statsd.eventType](name, value);
 
-  if (config.statsd.sampleRate)
+  if (config.statsd.sampleRate) {
     message += '|@' + config.statsd.sampleRate
+  }
 
-  if (config.statsd.tags)
+  if (config.statsd.tags) {
     message += '|#' + config.statsd.tags.join(',')
+  }
 
   this.buffer.push(message);
 
