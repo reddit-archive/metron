@@ -41,7 +41,7 @@ Metron.prototype.processRequest = function(req, res) {
 
   if (req.method === 'GET') {
     if (!parsedUrl.query || !parsedUrl.query.data) {
-      return this.endRequest(req, res, 400);
+      return this.endRequest(req, res, 400, 'No data passed in.');
     }
 
     try{
@@ -83,6 +83,7 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
 
   req.ended = true;
   res.writeHead(statusCode || 204);
+  res.write(error);
   res.end();
 };
 
@@ -102,7 +103,7 @@ Metron.prototype.processParameters = function(req, res) {
     var segment = params[segmentName];
 
     if (!segmentConfig) {
-      return this.endRequest(req, res, 422);
+      return this.endRequest(req, res, 422, segmentName + ' not defined.');
     }
 
     for (var statName in segment) {
@@ -136,5 +137,7 @@ Metron.dataAdapters = {
   Statsd: require('./data/statsd'),
   Log: require('./data/log')
 }
+
+Metron.utils = utils;
 
 module.exports = Metron;
