@@ -36,7 +36,7 @@ Metron.prototype.stop = function() {
 }
 
 Metron.prototype.processRequest = function(req, res) {
-  var params = { };
+  var params = {};
   var parsedUrl = url.parse(req.url, true);
 
   if (req.method === 'GET') {
@@ -44,13 +44,13 @@ Metron.prototype.processRequest = function(req, res) {
       return this.endRequest(req, res, 400, 'No data passed in.');
     }
 
-    try{
+    try {
       req.params = JSON.parse(parsedUrl.query.data);
       this.processParameters(req, res);
-    }catch(e) {
+    } catch(e) {
       return this.endRequest(req, res, 400, e);
     }
-  } else{
+  } else {
     var body = [];
 
     req.on('data', function (data) {
@@ -61,12 +61,12 @@ Metron.prototype.processRequest = function(req, res) {
       body = body.join('');
 
       if (req.headers['Content-Type'].toLowerCase().indexOf('json') > -1) {
-        try{
+        try {
           params = JSON.parse(body);
-        }catch(e) {
+        } catch(e) {
           return this.endRequest(req, res, 400, e);
         }
-      } else{
+      } else {
         req.params = qs.parse(body);
         this.processParameters(req, res);
       }
@@ -81,8 +81,16 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
     console.log(error);
   }
 
+  if (!statusCode) {
+    if (error) {
+      statusCode = 500;
+    } else {
+      statusCode = 204;
+    }
+  }
+
   req.ended = true;
-  res.writeHead(statusCode || 204);
+  res.writeHead(statusCode);
   res.write(error);
   res.end();
 };
@@ -94,7 +102,9 @@ Metron.prototype.processParameters = function(req, res) {
     for (var i = 0; i < this.config.middleware.length; i++) {
       this.config.middleware[i](req, res, this);
       // return early if one of the middlewares ended the request.
-      if (req.ended) return;
+      if (req.ended) {
+        return;
+      }
     }
   }
 
@@ -103,7 +113,8 @@ Metron.prototype.processParameters = function(req, res) {
     var segment = params[segmentName];
 
     if (!segmentConfig) {
-      return this.endRequest(req, res, 422, segmentName + ' not defined.');
+      var error = segmentName + ' not defined.';
+      return this.endRequest(req, res, 422, error);
     }
 
     for (var statName in segment) {

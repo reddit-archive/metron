@@ -51,7 +51,7 @@ Statsd.prototype.send = function(name, value, config, req) {
     name = config.statsd.formatName(name, value, config, req);
   }
 
-  if (name === undefined) {
+  if (!name) {
     return;
   }
 
@@ -84,13 +84,13 @@ Statsd.prototype.send = function(name, value, config, req) {
 
 Statsd.prototype.flushBuffer = function() {
   if (!this.config.bufferTimeout) {
-    this.buffer.forEach((function(b) {
-      var buffer = new Buffer(b);
-      this.socket.send(buffer, 0, buffer.length, this.config.port,
-        this.config.host, function() {});
-    }).bind(this));
+    var buffer = new Buffer(this.buffer.join('\n'));
+
+    this.socket.send(buffer, 0, buffer.length, this.config.port,
+      this.config.host, function() {});
 
     this.buffer = [];
+    return;
   }
 
   var now = new Date();
@@ -113,8 +113,7 @@ Statsd.prototype.flushBuffer = function() {
 }
 
 Statsd.prototype.counter = function(name, value) {
-  value = name + ':' + value + '|c';
-  return value;
+  return name + ':' + value + '|c';
 }
 
 Statsd.prototype.increment = function(name, value) {
@@ -126,18 +125,15 @@ Statsd.prototype.decrement = function(name, value) {
 }
 
 Statsd.prototype.gauge = function(name, value) {
-  value = name + ':' + value + '|g';
-  return value;
+  return name + ':' + value + '|g';
 }
 
 Statsd.prototype.timing = function(name, value) {
-  value = name + ':' + value + '|ms';
-  return value;
+  return name + ':' + value + '|ms';
 }
 
 Statsd.prototype.set = function(name, value) {
-  value = name + ':' + value + '|s';
-  return value;
+  return name + ':' + value + '|s';
 }
 
 module.exports = Statsd;

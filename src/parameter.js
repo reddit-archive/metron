@@ -38,6 +38,10 @@ var conversion = {
 }
 
 function Parameter(val, config) {
+  if(val === undefined){
+    return val;
+  }
+
   this.config = config || {};
 
   this.val = val;
@@ -51,8 +55,8 @@ function Parameter(val, config) {
     }
   }
 
-  this.val = this.validate();
-  this.val = this.format();
+  this.validate();
+  this.format();
 }
 
 Parameter.prototype.value = function() {
@@ -63,38 +67,33 @@ Parameter.prototype.validate = function() {
   var val = this.val;
   var config = this.config;
 
-  if (config.max !== undefined && val > config.max) {
+  if ((config.max !== undefined && val > config.max) ||
+      (config.min !== undefined && val < config.min) ||
+      (config.length !== undefined && val.length > config.length)) {
+
+    this.val = undefined;
     return;
   }
 
-  if (config.min !== undefined && val < config.min) {
-    return;
+  if (config.validate) {
+    this.val = config.validate(val);
   }
-
-  if (config.length !== undefined && val.length > config.length) {
-    return;
-  }
-
-  if (!config.validate) {
-    return val;
-  }
-
-  return config.validate(val);
 }
 
 Parameter.prototype.format = function() {
-  var val = this.val;
   var config = this.config;
 
+  if (!this.val) {
+    return;
+  }
+
   if (config.truncate) {
-    val = val.substring(0, config.truncate)
+    this.val = this.val.substring(0, config.truncate)
   }
 
   if (config.format) {
-    return config.format(val, config);
+    this.val = config.format(this.val, config);
   }
-
-  return val;
 }
 
 module.exports = Parameter;

@@ -31,7 +31,7 @@ Log.prototype.send = function(name, value, config, req) {
     name = config.log.formatName(name, value, config, req);
   }
 
-  if (name === undefined) {
+  if (!name) {
     return;
   }
 

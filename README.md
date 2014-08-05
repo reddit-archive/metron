@@ -1,7 +1,7 @@
 metron
 ======
 
-Your friendly metrics-gathering robot.
+A simple whitelisted statsd passthrough.
 
 ```
       ,     ,
