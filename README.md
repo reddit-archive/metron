@@ -15,7 +15,7 @@ A simple whitelisted statsd passthrough.
  (\   /____\
 ```
 
-[![travis-ci status](https://travis-ci.org/ajacksified/metron.svg)](http://travis-ci.org/ajacksified/metron)
+[![travis-ci status](https://travis-ci.org/reddit/metron.svg)](http://travis-ci.org/reddit/metron)
 
 Simple configuration-based web server. Data goes into the metron, and out to
 a data store. As simple as can be.
@@ -128,5 +128,5 @@ single request as well.
 
 License
 =======
-[MIT](./LICENSE). Copyright 2014 Jack Lawson.
+[MIT](./LICENSE). Copyright 2014 reddit.
 

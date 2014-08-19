@@ -8,17 +8,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ajacksified/metron.git"
+    "url": "https://github.com/reddit/metron.git"
   },
   "keywords": [
     "statsd"
   ],
-  "author": "Jack Lawson <ajacksified@gmail.com>",
+  "author": "Jack Lawson <jack@reddit.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ajacksified/metron/issues"
+    "url": "https://github.com/reddit/metron/issues"
   },
-  "homepage": "https://github.com/ajacksified/metron",
+  "homepage": "https://github.com/reddit/metron",
   "devDependencies": {
     "chai": "^1.9.1",
     "mocha": "^1.20.1",
