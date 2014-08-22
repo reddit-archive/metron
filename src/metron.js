@@ -57,20 +57,24 @@ Metron.prototype.processRequest = function(req, res) {
       body.push(data.toString());
     });
 
-    req.on('end', function () {
+    req.on('end', (function () {
       body = body.join('');
 
-      if (req.headers['Content-Type'].toLowerCase().indexOf('json') > -1) {
+      var isJSON = req.headers['content-type'] && 
+          req.headers['content-type'].toLowerCase().indexOf('json') > -1;
+
+      if (isJSON) {
         try {
-          params = JSON.parse(body);
+          req.params = JSON.parse(body);
         } catch(e) {
           return this.endRequest(req, res, 400, e);
         }
       } else {
         req.params = qs.parse(body);
-        this.processParameters(req, res);
       }
-    });
+
+      this.processParameters(req, res);
+    }).bind(this));
   }
 }
 
