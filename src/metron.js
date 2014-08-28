@@ -79,18 +79,16 @@ Metron.prototype.processRequest = function(req, res) {
 }
 
 Metron.prototype.endRequest = function(req, res, statusCode, error) {
+  statusCode = statusCode || 204;
+
   if (error && this.config.debug) {
     console.log('ERROR:');
     console.log(req.params);
-    console.log(error);
+    console.log(error.message);
   }
 
-  if (!statusCode) {
-    if (error) {
-      statusCode = 500;
-    } else {
-      statusCode = 204;
-    }
+  if (error) {
+    statusCode = 500;
   }
 
   req.ended = true;
@@ -124,6 +122,10 @@ Metron.prototype.processParameters = function(req, res) {
     for (var statName in segment) {
       var statConfig = segmentConfig.stats[statName];
       var statValue = segment[statName];
+
+      if (!statConfig) {
+        continue;
+      }
 
       statValue = new Parameter(statValue, statConfig).value();
 
