@@ -63,8 +63,8 @@ Statsd.prototype.send = function(name, value, config, req) {
     return;
   }
 
-  if (this.config.prefix) {
-    name = this.config.prefix + '.' + name;
+  if (config.prefix) {
+    name = config.prefix + '.' + name;
   }
 
   var message = this[config.statsd.eventType](name, value);
@@ -84,12 +84,7 @@ Statsd.prototype.send = function(name, value, config, req) {
 
 Statsd.prototype.flushBuffer = function() {
   if (!this.config.bufferTimeout) {
-    var buffer = new Buffer(this.buffer.join('\n'));
-
-    this.socket.send(buffer, 0, buffer.length, this.config.port,
-      this.config.host, function() {});
-
-    this.buffer = [];
+    this.flushToSocket();
     return;
   }
 
@@ -98,10 +93,8 @@ Statsd.prototype.flushBuffer = function() {
   // If it's been a second, go ahead and flush and clear the timeout.
   if (now - this.lastFlush > this.config.bufferTimeout) {
     clearTimeout(this.bufferTimeout);
-    this.bufferTimeout = null;
-      var buffer = new Buffer(this.buffer.join('\n'));
-      this.socket.send(buffer, 0, buffer.length, this.config.port,
-        this.config.host, function() {});
+    this.bufferTimeout = undefined;
+    this.flushToSocket();
   } else {
     // If it hasn't been a second, and there's no delayed call, create one
     // so everything gets flushed after a second.
@@ -110,6 +103,21 @@ Statsd.prototype.flushBuffer = function() {
           this.config.bufferTimeout);
     }
   }
+}
+
+Statsd.prototype.flushToSocket = function() {
+  var buffer = new Buffer(this.buffer.join('\n'));
+
+  var response = (function(err, bytes) {
+    if (this.config.debug) {
+      console.log(err);
+    }
+  }).bind(this);
+
+  this.socket.send(buffer, 0, buffer.length, this.config.port,
+                   this.config.host, response);
+
+  this.buffer = [];
 }
 
 Statsd.prototype.counter = function(name, value) {
