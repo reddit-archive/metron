@@ -94,7 +94,7 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
   req.ended = true;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since');
 
   res.writeHead(statusCode);
   res.write(error);
