@@ -81,14 +81,15 @@ Metron.prototype.processRequest = function(req, res) {
 Metron.prototype.endRequest = function(req, res, statusCode, error) {
   statusCode = statusCode || 204;
 
+  if (error) {
+    error = error.message ? error.message : error
+    statusCode = 500;
+  }
+
   if (error && this.config.debug) {
     console.log('ERROR:');
     console.log(req.params);
-    console.log(error.message);
-  }
-
-  if (error) {
-    statusCode = 500;
+    console.log(error);
   }
 
   req.ended = true;
@@ -97,7 +98,11 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
   res.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since');
 
   res.writeHead(statusCode);
-  res.write(error);
+
+  if (error) {
+    res.write(error.toString());
+  }
+
   res.end();
 };
 
