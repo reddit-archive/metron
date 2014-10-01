@@ -3,7 +3,16 @@ var crypto = require('crypto');
 var utils = require('../utils');
 
 var defaultLogConfig = {
-  log: console.log
+  format: function(segment, req) {
+    var log = segment.reduce(function(initial, stat) {
+      return initial  + stat.val + '\t';
+    }, '');
+
+    return log.trim();
+  },
+  save: function(str) {
+    console.log(str);
+  },
 };
 
 function Log(config) {
@@ -11,48 +20,30 @@ function Log(config) {
   this.send = this.send.bind(this);
 }
 
-Log.prototype.format = function(name, value, config, id) {
+Log.prototype.format = function(segment, config, req) {
+  config.log = config.log || {};
+
   var format = config.log.format || this.config.format;
-
-  if (format) {
-    return format(name, value, config, id);
-  }
-
-  return id + ':\t' + name + '\t' + value;
+  return format(segment, req);
 }
 
-Log.prototype.send = function(name, value, config, req) {
-  if (config.log.sampleRate !== undefined && 
+Log.prototype.save = function(logString, config) {
+  config.log = config.log || {};
+
+  var save = config.log.save || this.config.save;
+  return save(logString, config);
+}
+
+Log.prototype.send = function(segment, config, req) {
+  config.log = config.log || {};
+
+  if (config.log.sampleRate !== undefined &&
       Math.random() >= config.log.sampleRate) {
     return;
   }
 
-  if (config.log.formatName) {
-    name = config.log.formatName(name, value, config, req);
-  }
-
-  if (!name) {
-    return;
-  }
-
-  if (config.log.formatValue) {
-    value = config.log.formatValue(name, value, config, req);
-  }
-
-  if (value === undefined) {
-    return;
-  }
-
-  // Generate an id that more or less identifies a user.
-  var userAgent = req.headers['user-agent'] || Math.random().toString();
-  var host = req.headers.host || Math.random().toString();
-  var id;
-
-  var shasum = crypto.createHash('sha1');
-  shasum.update(host + userAgent);
-  id = shasum.digest('hex');
-
-  return this.config.log(this.format(name, value, config, id));
+  var logString = this.format(segment, config, req);
+  this.save(logString, config);
 }
 
 module.exports = Log;

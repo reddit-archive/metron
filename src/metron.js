@@ -7,28 +7,31 @@ var utils = require('./utils');
 var Parameter = require('./parameter');
 
 var defaultConfig = {
-  segments: [],
-  port: 8000
+  port: 8000,
 };
 
 function Metron(config) {
   this.config = utils.merge(defaultConfig, config);
+  this.segments = [];
+  this.middleware = [];
 }
 
-Metron.prototype.get = function(key) {
-  return this.config[key];
-}
+Metron.prototype.registerSegment = function(name, config) {
+  this.segments[name] = config;
+};
 
-Metron.prototype.set = function(obj) {
-  this.config = utils.merge(this.config, obj);
-  return this.config;
-}
+Metron.prototype.registerMiddleware = function(fn, predicate) {
+  this.middleware.push({
+    fn: fn,
+    predicate: predicate,
+  });
+};
 
 Metron.prototype.start = function() {
   var server  = http.createServer(this.processRequest.bind(this));
   this.server = server;
 
-  server.listen(this.get('port'));
+  server.listen(this.config.port);
 }
 
 Metron.prototype.stop = function() {
@@ -109,50 +112,52 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
 Metron.prototype.processParameters = function(req, res) {
   var params = req.params;
 
-  if (this.config.middleware) {
-    for (var i = 0; i < this.config.middleware.length; i++) {
-      this.config.middleware[i](req, res, this);
-      // return early if one of the middlewares ended the request.
-      if (req.ended) {
-        return;
-      }
+  this.middleware.forEach((function(m) {
+    if(m.predicate && !m.predicate(req)) {
+      return;
     }
+
+    m.fn(req, res, this);
+  }).bind(this));
+
+  // return early if one of the middlewares ended the request.
+  if (req.ended) {
+    return;
   }
 
   for (var segmentName in params) {
-    var segmentConfig = this.config.segments[segmentName];
+    var segmentConfig = this.segments[segmentName];
     var segment = params[segmentName];
+    var formattedSegment = [];
 
     if (!segmentConfig) {
-      var error = segmentName + ' not defined.';
-      return this.endRequest(req, res, 422, error);
+      continue;
     }
 
-    for (var statName in segment) {
+    for (var statName in segmentConfig.stats) {
       var statConfig = segmentConfig.stats[statName];
+      statConfig = utils.merge(segmentConfig, statConfig);
+
       var statValue = segment[statName];
 
       if (!statConfig) {
         continue;
       }
 
-      statValue = new Parameter(statValue, statConfig).value();
+      stat = new Parameter(statName, statValue, statConfig, req);
 
-      if (statValue !== undefined) {
-        var config = utils.merge(segmentConfig, statConfig);
-
-        var store = statConfig.dataStore ||
-                    segmentConfig.dataStore ||
-                    console.log;
-
-        if (typeof store === 'function') {
-          store(statName, statValue, config, req);
-        } else if (typeof store === 'object') {
-          store.forEach(function(s) {
-            s(statName, statValue, config, req);
-          });
-        }
+      if (stat.val !== undefined) {
+        formattedSegment.push(stat);
       }
+    }
+
+    if(formattedSegment) {
+      var store = segmentConfig.dataStore ||
+                  [console.log];
+
+      store.forEach(function(s) {
+        s(formattedSegment, segmentConfig, req);
+      });
     }
   }
 

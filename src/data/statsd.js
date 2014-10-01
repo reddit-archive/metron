@@ -35,49 +35,35 @@ Statsd.prototype.stop = function() {
   this.socket.close();
 }
 
-Statsd.prototype.send = function(name, value, config, req) {
+Statsd.prototype.send = function(segment, config, req) {
   config.statsd = config.statsd || {};
 
-  if (!this[config.statsd.eventType]) {
-    return;
-  }
+  segment.forEach((function(stat) {
+    var config = stat.config;
+    var name = stat.name;
+    var value = stat.val;
+    var message = '';
 
-  if (config.statsd.sampleRate !== undefined &&
-      Math.random() >= config.statsd.sampleRate) {
-    return;
-  }
+    if (!Statsd[config.statsd.eventType]) {
+      return;
+    }
 
-  if (config.statsd.formatName) {
-    name = config.statsd.formatName(name, value, config, req);
-  }
+    if (config.prefix) {
+      name = config.prefix + '.' + name;
+    }
 
-  if (!name) {
-    return;
-  }
+    message = Statsd[config.statsd.eventType](name, value);
 
-  if (config.statsd.formatValue) {
-    value = config.statsd.formatValue(name, value, config, req);
-  }
+    if (config.statsd.sampleRate) {
+      message += '|@' + config.statsd.sampleRate
+    }
 
-  if (value === undefined) {
-    return;
-  }
+    if (config.statsd.tags) {
+      message += '|#' + config.statsd.tags.join(',')
+    }
 
-  if (config.prefix) {
-    name = config.prefix + '.' + name;
-  }
-
-  var message = this[config.statsd.eventType](name, value);
-
-  if (config.statsd.sampleRate) {
-    message += '|@' + config.statsd.sampleRate
-  }
-
-  if (config.statsd.tags) {
-    message += '|#' + config.statsd.tags.join(',')
-  }
-
-  this.buffer.push(message);
+    this.buffer.push(message);
+  }).bind(this));
 
   this.flushBuffer();
 }
@@ -120,27 +106,27 @@ Statsd.prototype.flushToSocket = function() {
   this.buffer = [];
 }
 
-Statsd.prototype.counter = function(name, value) {
+Statsd.counter = function(name, value) {
   return name + ':' + value + '|c';
 }
 
-Statsd.prototype.increment = function(name, value) {
-  return this.counter(name, value || 1);
+Statsd.increment = function(name, value) {
+  return Statsd.counter(name, value || 1);
 }
 
-Statsd.prototype.decrement = function(name, value) {
-  return this.counter(name, -value || -1);
+Statsd.decrement = function(name, value) {
+  return Statsd.counter(name, -value || -1);
 }
 
-Statsd.prototype.gauge = function(name, value) {
+Statsd.gauge = function(name, value) {
   return name + ':' + value + '|g';
 }
 
-Statsd.prototype.timing = function(name, value) {
+Statsd.timing = function(name, value) {
   return name + ':' + value + '|ms';
 }
 
-Statsd.prototype.set = function(name, value) {
+Statsd.set = function(name, value) {
   return name + ':' + value + '|s';
 }
 

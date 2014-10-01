@@ -10,6 +10,7 @@ var conversion = {
 
      return val;
   },
+
   'float': function(val) {
      val = parseFloat(val);
 
@@ -19,9 +20,11 @@ var conversion = {
 
      return val;
   },
+
   'string': function(val) {
     return val.toString();
   },
+
   'date': function(val) {
     var date = new Date(val);
 
@@ -37,31 +40,29 @@ var conversion = {
   }
 }
 
-function Parameter(val, config) {
-  if(val === undefined){
-    return val;
+function Parameter(name, val, config, req) {
+  if(val === undefined || name === undefined){
+    return undefined;
   }
 
+  this.name = name;
+  this.val = val;
   this.config = config || {};
 
-  this.val = val;
-
-  if (this.config.type) {
-    try {
-      this.val = conversion[this.config.type](val);
-    } catch(e) {
-      this.val = undefined;
-      return;
-    }
-  }
-
+  this.convert();
   this.validate();
-  this.format();
+  this.format(req);
 }
 
-Parameter.prototype.value = function() {
-  return this.val;
-};
+Parameter.prototype.convert = function() {
+  if (this.config.type) {
+    try {
+      this.val = conversion[this.config.type](this.val);
+    } catch(e) {
+      this.val = undefined;
+    }
+  }
+}
 
 Parameter.prototype.validate = function() {
   var val = this.val;
@@ -80,7 +81,7 @@ Parameter.prototype.validate = function() {
   }
 }
 
-Parameter.prototype.format = function() {
+Parameter.prototype.format = function(req) {
   var config = this.config;
 
   if (!this.val) {
@@ -93,6 +94,14 @@ Parameter.prototype.format = function() {
 
   if (config.format) {
     this.val = config.format(this.val, config);
+  }
+
+  if(this.config.formatName) {
+    this.name = this.config.formatName(this.name, this.val, this.config, req);
+  }
+
+  if(this.config.formatValue) {
+    this.val = this.config.formatValue(this.val);
   }
 }
 
