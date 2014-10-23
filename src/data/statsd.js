@@ -92,6 +92,10 @@ Statsd.prototype.flushBuffer = function() {
 }
 
 Statsd.prototype.flushToSocket = function() {
+  if(!this.buffer) {
+    return;
+  }
+
   var buffer = new Buffer(this.buffer.join('\n'));
 
   var response = (function(err, bytes) {
