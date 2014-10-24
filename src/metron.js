@@ -84,7 +84,7 @@ Metron.prototype.processRequest = function(req, res) {
 Metron.prototype.endRequest = function(req, res, statusCode, error) {
   statusCode = statusCode || 204;
 
-  if (error) {
+  if (error && !statusCode) {
     error = error.message ? error.message : error
     statusCode = 500;
   }

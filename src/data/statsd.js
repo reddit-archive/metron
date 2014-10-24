@@ -29,6 +29,8 @@ function Statsd(config) {
   this.lastFlush = new Date();
   this.buffer = [];
   this.socket = this.config.socket || dgram.createSocket('udp4');
+
+  this.log = this.config.log || console.log;
 }
 
 Statsd.prototype.stop = function() {
@@ -100,12 +102,19 @@ Statsd.prototype.flushToSocket = function() {
 
   var response = (function(err, bytes) {
     if (this.config.debug) {
-      console.log(err);
+      this.log(err);
     }
   }).bind(this);
 
-  this.socket.send(buffer, 0, buffer.length, this.config.port,
-                   this.config.host, response);
+  try {
+    this.socket.send(buffer, 0, buffer.length, this.config.port,
+                     this.config.host, response);
+  } catch (e) {
+    this.log('Failed sending buffer to socket');
+    this.log(buffer);
+    this.log(buffer.length);
+    this.log(this.config.host + ':' + this.config.port);
+  }
 
   this.buffer = [];
 }
