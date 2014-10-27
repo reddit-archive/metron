@@ -80,6 +80,7 @@ Statsd.prototype.flushBuffer = function() {
 
   // If it's been a second, go ahead and flush and clear the timeout.
   if (now - this.lastFlush > this.config.bufferTimeout) {
+    this.lastFlush = now;
     clearTimeout(this.bufferTimeout);
     this.bufferTimeout = undefined;
     this.flushToSocket();
@@ -94,11 +95,12 @@ Statsd.prototype.flushBuffer = function() {
 }
 
 Statsd.prototype.flushToSocket = function() {
-  if(!this.buffer) {
+  var buffer = new Buffer(this.buffer.join('\n'));
+  this.buffer = [];
+
+  if(buffer.length === 0) {
     return;
   }
-
-  var buffer = new Buffer(this.buffer.join('\n'));
 
   var response = (function(err, bytes) {
     if (this.config.debug) {
@@ -115,8 +117,6 @@ Statsd.prototype.flushToSocket = function() {
     this.log(buffer.length);
     this.log(this.config.host + ':' + this.config.port);
   }
-
-  this.buffer = [];
 }
 
 Statsd.counter = function(name, value) {
