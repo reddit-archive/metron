@@ -4,6 +4,7 @@
   "description": "simple whitelisted statsd passthrough.",
   "main": "src/metron.js",
   "scripts": {
+    "lint": "jshint . && jscs .",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {

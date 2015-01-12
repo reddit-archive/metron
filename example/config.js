@@ -1,18 +1,20 @@
+'use strict';
+
 var Statsd = require('metron').dataAdapters.Statsd;
 var statsd = new Statsd({
-  host: process.env.statsd_host,
-  port: process.env.statsd_port,
+  host: process.env.STATDSD_HOST,
+  port: process.env.STATSD_PORT,
 });
 
 var intConfig = {
   type: 'number',
   min: 0,
-  max: 100
+  max: 100,
 };
 
 var stringConfig = {
   type: 'string',
-  length: 256
+  length: 256,
 };
 
 var config = {
@@ -30,9 +32,9 @@ var config = {
         domContentLoadedTiming: intConfig,
         actionName: stringConfig,
         verification: stringConfig,
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
 
 module.exports = config;

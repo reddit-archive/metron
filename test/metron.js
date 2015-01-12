@@ -1,5 +1,4 @@
-/* jshint strict:false */
-/* global describe,it,beforeEach,afterEach */
+'use strict';
 
 var Metron = require('../src/metron');
 var sinon = require('sinon');
@@ -15,21 +14,21 @@ var qs = require('querystring');
 
 describe('Metron', function() {
   var config = {
-    port: 80
-  }
+    port: 80,
+  };
 
   it('initializes with config', function() {
-    var metron = new Metron(config)
+    var metron = new Metron(config);
     expect(metron.get('port')).to.equal(80);
   });
 
   it('can get config values', function() {
-    var metron = new Metron(config)
+    var metron = new Metron(config);
     expect(metron.get('port')).to.equal(metron.config.port);
   });
 
   it('can set config values', function() {
-    var metron = new Metron(config)
+    var metron = new Metron(config);
 
     metron.set({ port: 8080 });
     expect(metron.get('port')).to.equal(8080);
@@ -39,7 +38,7 @@ describe('Metron', function() {
 describe('Metron server', function() {
   var config = {
     port: 8080,
-    debug: true
+    debug: true,
   };
 
   var metron;
@@ -77,11 +76,11 @@ describe('Metron server', function() {
           stats: {
             totalLoadTime: {
               type: 'integer',
-              dataStore: [ sinon.spy() ]
-            }
-          }
-        }
-      }
+              dataStore: [sinon.spy()],
+            },
+          },
+        },
+      },
     };
 
     metron.set(metronConfig);
@@ -99,6 +98,7 @@ describe('Metron server', function() {
     });
   });
 
+  /* jshint maxlen: false */
   it('logs data specified in the Metron config to multiple stores', function(done) {
     var metronConfig = {
       segments: {
@@ -106,11 +106,11 @@ describe('Metron server', function() {
           stats: {
             totalLoadTime: {
               type: 'integer',
-              dataStore: [sinon.spy(), sinon.spy()]
-            }
-          }
-        }
-      }
+              dataStore: [sinon.spy(), sinon.spy()],
+            },
+          },
+        },
+      },
     };
 
     metron.set(metronConfig);
@@ -132,4 +132,3 @@ describe('Metron server', function() {
   });
 
 });
-

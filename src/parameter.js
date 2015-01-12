@@ -1,31 +1,32 @@
-/* jshint strict:false */
+'use strict';
 
 var conversion = {
-  'integer': function(val) {
-     val = parseInt(val);
 
-     if (isNaN(val)) {
-        return;
-     }
+  integer: function(val) {
+    val = parseInt(val);
 
-     return val;
+    if (isNaN(val)) {
+      return;
+    }
+
+    return val;
   },
 
-  'float': function(val) {
-     val = parseFloat(val);
+  float: function(val) {
+    val = parseFloat(val);
 
-     if (isNaN(val)) {
-        return;
-     }
+    if (isNaN(val)) {
+      return;
+    }
 
-     return val;
+    return val;
   },
 
-  'string': function(val) {
+  string: function(val) {
     return val.toString();
   },
 
-  'date': function(val) {
+  date: function(val) {
     var date = new Date(val);
 
     if (isNaN(date.getTime())) {
@@ -37,11 +38,12 @@ var conversion = {
     }
 
     return date;
-  }
-}
+  },
+
+};
 
 function Parameter(name, val, config, req) {
-  if(val === undefined || name === undefined){
+  if (val === undefined || name === undefined) {
     return undefined;
   }
 
@@ -58,11 +60,11 @@ Parameter.prototype.convert = function() {
   if (this.config.type) {
     try {
       this.val = conversion[this.config.type](this.val);
-    } catch(e) {
+    } catch (e) {
       this.val = undefined;
     }
   }
-}
+};
 
 Parameter.prototype.validate = function() {
   var val = this.val;
@@ -79,7 +81,7 @@ Parameter.prototype.validate = function() {
   if (config.validate) {
     this.val = config.validate(val);
   }
-}
+};
 
 Parameter.prototype.format = function(req) {
   var config = this.config;
@@ -89,21 +91,20 @@ Parameter.prototype.format = function(req) {
   }
 
   if (config.truncate) {
-    this.val = this.val.substring(0, config.truncate)
+    this.val = this.val.substring(0, config.truncate);
   }
 
   if (config.format) {
     this.val = config.format(this.val, config);
   }
 
-  if(this.config.formatName) {
+  if (this.config.formatName) {
     this.name = this.config.formatName(this.name, this.val, this.config, req);
   }
 
-  if(this.config.formatValue) {
+  if (this.config.formatValue) {
     this.val = this.config.formatValue(this.val);
   }
-}
+};
 
 module.exports = Parameter;
-

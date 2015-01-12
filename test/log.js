@@ -1,5 +1,4 @@
-/* jshint strict:false */
-/* global describe,it,beforeEach */
+'use strict';
 
 var Log = require('../src/data/log');
 var sinon = require('sinon');
@@ -22,18 +21,18 @@ describe('Log adapter', function() {
     headers: {
       host: '127.0.0.1',
       'user-agent': 'curl/7.22.0',
-      'accept': '*/*'
-    }
+      accept: '*/*',
+    },
   };
 
   beforeEach(function() {
     log = new Log({
-      log: sinon.spy()
+      log: sinon.spy(),
     });
 
     eventConfig = {
       log: {
-      }
+      },
     };
   });
 
@@ -49,7 +48,7 @@ describe('Log adapter', function() {
   });
 
   it('applies sampling', function() {
-    eventConfig.log.sampleRate = 0
+    eventConfig.log.sampleRate = 0;
     log.send('test', 1, eventConfig, req);
     expect(log.config.log.args.length).to.equal(0);
   });
@@ -59,10 +58,10 @@ describe('Log adapter', function() {
     shasum.update(req.headers.host + req.headers['user-agent']);
     var id = shasum.digest('hex');
 
-    eventConfig.log.format = sinon.spy()
+    eventConfig.log.format = sinon.spy();
     log.send('test', 1, eventConfig, req);
 
     expect(eventConfig.log.format).to.be.calledWith(
         'test', 1, eventConfig, id);
   });
-})
+});

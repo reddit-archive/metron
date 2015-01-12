@@ -32,11 +32,11 @@ Metron.prototype.start = function() {
   this.server = server;
 
   server.listen(this.config.port);
-}
+};
 
 Metron.prototype.stop = function() {
   this.server.close();
-}
+};
 
 Metron.prototype.processRequest = function(req, res) {
   var params = {};
@@ -50,26 +50,26 @@ Metron.prototype.processRequest = function(req, res) {
     try {
       req.params = JSON.parse(parsedUrl.query.data);
       this.processParameters(req, res);
-    } catch(e) {
+    } catch (e) {
       return this.endRequest(req, res, 400, e);
     }
   } else {
     var body = [];
 
-    req.on('data', function (data) {
+    req.on('data', function(data) {
       body.push(data.toString());
     });
 
-    req.on('end', (function () {
+    req.on('end', (function() {
       body = body.join('');
 
-      var isJSON = req.headers['content-type'] && 
+      var isJSON = req.headers['content-type'] &&
           req.headers['content-type'].toLowerCase().indexOf('json') > -1;
 
       if (isJSON) {
         try {
           req.params = JSON.parse(body);
-        } catch(e) {
+        } catch (e) {
           return this.endRequest(req, res, 400, e);
         }
       } else {
@@ -79,13 +79,13 @@ Metron.prototype.processRequest = function(req, res) {
       this.processParameters(req, res);
     }).bind(this));
   }
-}
+};
 
 Metron.prototype.endRequest = function(req, res, statusCode, error) {
   statusCode = statusCode || 204;
 
   if (error && !statusCode) {
-    error = error.message ? error.message : error
+    error = error.message ? error.message : error;
     statusCode = 500;
   }
 
@@ -98,7 +98,19 @@ Metron.prototype.endRequest = function(req, res, statusCode, error) {
   req.ended = true;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since');
+  res.setHeader('Access-Control-Allow-Headers', [
+    'Authorization',
+    'Content-Type',
+    'Accept',
+    'Origin',
+    'User-Agent',
+    'DNT',
+    'Cache-Control',
+    'X-Mx-ReqToken',
+    'Keep-Alive',
+    'X-Requested-With',
+    'If-Modified-Since',
+  ].join(','));
 
   res.writeHead(statusCode);
 
@@ -113,7 +125,7 @@ Metron.prototype.processParameters = function(req, res) {
   var params = req.params;
 
   this.middleware.forEach((function(m) {
-    if(m.predicate && !m.predicate(req)) {
+    if (m.predicate && !m.predicate(req)) {
       return;
     }
 
@@ -144,17 +156,18 @@ Metron.prototype.processParameters = function(req, res) {
         continue;
       }
 
-      stat = new Parameter(statName, statValue, statConfig, req);
+      var stat = new Parameter(statName, statValue, statConfig, req);
 
       if (stat.val !== undefined) {
         formattedSegment.push(stat);
       }
     }
 
-    if(formattedSegment) {
+    if (formattedSegment) {
       var store = segmentConfig.dataStore ||
                   [console.log];
 
+      /* jshint loopfunc: true */
       store.forEach(function(s) {
         s(formattedSegment, segmentConfig, req);
       });
@@ -162,12 +175,12 @@ Metron.prototype.processParameters = function(req, res) {
   }
 
   this.endRequest(req, res);
-}
+};
 
 Metron.dataAdapters = {
   Statsd: require('./data/statsd'),
-  Log: require('./data/log')
-}
+  Log: require('./data/log'),
+};
 
 Metron.utils = utils;
 

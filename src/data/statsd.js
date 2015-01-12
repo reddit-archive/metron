@@ -1,8 +1,8 @@
-/* jshint strict:false */
+'use strict';
 
 var dgram = require('dgram');
 var dns = require('dns');
-var utils = require('../utils')
+var utils = require('../utils');
 
 var defaultStatsdConfig = {
   host: 'localhost',
@@ -10,7 +10,7 @@ var defaultStatsdConfig = {
   socketTimeout: 500,
   prefix: '',
   preCacheDNS: true,
-  bufferTimeout: 500
+  bufferTimeout: 500,
 };
 
 function Statsd(config) {
@@ -35,7 +35,7 @@ function Statsd(config) {
 
 Statsd.prototype.stop = function() {
   this.socket.close();
-}
+};
 
 Statsd.prototype.send = function(segment, config, req) {
   config.statsd = config.statsd || {};
@@ -57,18 +57,18 @@ Statsd.prototype.send = function(segment, config, req) {
     message = Statsd[config.statsd.eventType](name, value);
 
     if (config.statsd.sampleRate) {
-      message += '|@' + config.statsd.sampleRate
+      message += '|@' + config.statsd.sampleRate;
     }
 
     if (config.statsd.tags) {
-      message += '|#' + config.statsd.tags.join(',')
+      message += '|#' + config.statsd.tags.join(',');
     }
 
     this.buffer.push(message);
   }).bind(this));
 
   this.flushBuffer();
-}
+};
 
 Statsd.prototype.flushBuffer = function() {
   if (!this.config.bufferTimeout) {
@@ -92,13 +92,13 @@ Statsd.prototype.flushBuffer = function() {
           this.config.bufferTimeout);
     }
   }
-}
+};
 
 Statsd.prototype.flushToSocket = function() {
   var buffer = new Buffer(this.buffer.join('\n'));
   this.buffer = [];
 
-  if(buffer.length === 0) {
+  if (buffer.length === 0) {
     return;
   }
 
@@ -117,30 +117,30 @@ Statsd.prototype.flushToSocket = function() {
     this.log(buffer.length);
     this.log(this.config.host + ':' + this.config.port);
   }
-}
+};
 
 Statsd.counter = function(name, value) {
   return name + ':' + value + '|c';
-}
+};
 
 Statsd.increment = function(name, value) {
   return Statsd.counter(name, value || 1);
-}
+};
 
 Statsd.decrement = function(name, value) {
   return Statsd.counter(name, -value || -1);
-}
+};
 
 Statsd.gauge = function(name, value) {
   return name + ':' + value + '|g';
-}
+};
 
 Statsd.timing = function(name, value) {
   return name + ':' + value + '|ms';
-}
+};
 
 Statsd.set = function(name, value) {
   return name + ':' + value + '|s';
-}
+};
 
 module.exports = Statsd;

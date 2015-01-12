@@ -1,4 +1,5 @@
-/* jshint strict:false */
+'use strict';
+
 var crypto = require('crypto');
 var utils = require('../utils');
 
@@ -25,14 +26,14 @@ Log.prototype.format = function(segment, config, req) {
 
   var format = config.log.format || this.config.format;
   return format(segment, req);
-}
+};
 
 Log.prototype.save = function(logString, config) {
   config.log = config.log || {};
 
   var save = config.log.save || this.config.save;
   return save(logString, config);
-}
+};
 
 Log.prototype.send = function(segment, config, req) {
   config.log = config.log || {};
@@ -44,7 +45,6 @@ Log.prototype.send = function(segment, config, req) {
 
   var logString = this.format(segment, config, req);
   this.save(logString, config);
-}
+};
 
 module.exports = Log;
-

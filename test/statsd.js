@@ -1,5 +1,4 @@
-/* jshint strict:false */
-/* global describe,it,beforeEach */
+'use strict';
 
 var Statsd = require('../src/data/statsd');
 var sinon = require('sinon');
@@ -10,14 +9,14 @@ var sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 require('sinon-mocha').enhance(sinon);
 
-function socketStub(config) {
-  for(var key in config) {
+var SocketStub = function(config) {
+  for (var key in config) {
     this[key] = config[key];
   }
 
   this.close = sinon.spy();
   this.send = sinon.spy();
-}
+};
 
 describe('Statsd adapter', function() {
   var statsd;
@@ -27,15 +26,15 @@ describe('Statsd adapter', function() {
   beforeEach(function() {
     statsd = new Statsd({
       prefix: 'pre',
-      socket: new socketStub(),
+      socket: new SocketStub(),
       preCacheDNS: false,
-      bufferTimeout: 0
+      bufferTimeout: 0,
     });
 
     eventConfig = {
       statsd: {
         eventType: 'increment',
-      }
+      },
     };
 
     spy = statsd.socket.send;
@@ -109,7 +108,7 @@ describe('Statsd adapter', function() {
   });
 
   it('applies sampling', function() {
-    eventConfig.statsd.sampleRate = 1.00
+    eventConfig.statsd.sampleRate = 1.00;
     statsd.send('test', 1, eventConfig);
     var expectedMessage = 'pre.test:1|c|@1';
     var buffer = spy.args[0][0];
@@ -127,9 +126,9 @@ describe('Statsd adapter', function() {
   it('works with buffering', function(done) {
     statsd = new Statsd({
       prefix: 'pre',
-      socket: new socketStub(),
+      socket: new SocketStub(),
       preCacheDNS: false,
-      bufferTimeout: 100
+      bufferTimeout: 100,
     });
 
     spy = statsd.socket.send;
@@ -146,4 +145,4 @@ describe('Statsd adapter', function() {
       done();
     }, 150);
   });
-})
+});

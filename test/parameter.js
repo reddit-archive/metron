@@ -1,5 +1,4 @@
-/* jshint strict:false */
-/* global describe,it,beforeEach */
+'use strict';
 
 var Parameter = require('../src/parameter');
 var sinon = require('sinon');
@@ -72,7 +71,7 @@ describe('Parameter', function() {
       if (val === 'A') {
         return val;
       }
-    }
+    };
 
     var param = new Parameter('A', config);
     expect(param.value()).to.equal('A');
@@ -83,8 +82,8 @@ describe('Parameter', function() {
 
   it('formats results', function() {
     config.format = function(val) {
-      return val.replace(/-/,'.');
-    }
+      return val.replace(/-/, '.');
+    };
 
     var param = new Parameter('A-B', config);
     expect(param.value()).to.equal('A.B');
@@ -130,4 +129,3 @@ describe('Parameter', function() {
     expect(param.value()).to.equal('AB');
   });
 });
-
