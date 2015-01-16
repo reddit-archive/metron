@@ -86,10 +86,6 @@ Parameter.prototype.validate = function() {
 Parameter.prototype.format = function(req) {
   var config = this.config;
 
-  if (!this.val) {
-    return;
-  }
-
   if (config.truncate) {
     this.val = this.val.substring(0, config.truncate);
   }
