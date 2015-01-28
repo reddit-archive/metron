@@ -180,6 +180,7 @@ Metron.prototype.processParameters = function(req, res) {
 Metron.dataAdapters = {
   Statsd: require('./data/statsd'),
   Log: require('./data/log'),
+  LogStream: require('./data/log-stream'),
 };
 
 Metron.utils = utils;
