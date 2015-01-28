@@ -11,9 +11,6 @@ var defaultLogConfig = {
 
     return log.trim();
   },
-  save: function(str) {
-    console.log(str);
-  },
 };
 
 function Log(config) {
@@ -25,14 +22,12 @@ Log.prototype.format = function(segment, config, req) {
   config.log = config.log || {};
 
   var format = config.log.format || this.config.format;
+
   return format(segment, req);
 };
 
-Log.prototype.save = function(logString, config) {
-  config.log = config.log || {};
-
-  var save = config.log.save || this.config.save;
-  return save(logString, config);
+Log.prototype.save = function(str) {
+  return console.log(str);
 };
 
 Log.prototype.send = function(segment, config, req) {
@@ -43,8 +38,7 @@ Log.prototype.send = function(segment, config, req) {
     return;
   }
 
-  var logString = this.format(segment, config, req);
-  this.save(logString, config);
+  this.save(this.format(segment, config, req));
 };
 
 module.exports = Log;
