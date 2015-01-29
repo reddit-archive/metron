@@ -23,7 +23,7 @@ var conversion = {
   },
 
   string: function(val) {
-    return val.toString();
+    return (val == null ? '' : val).toString();
   },
 
   date: function(val) {
@@ -86,7 +86,7 @@ Parameter.prototype.validate = function() {
 Parameter.prototype.format = function(req) {
   var config = this.config;
 
-  if (config.truncate) {
+  if (config.type === 'string' && config.truncate) {
     this.val = this.val.substring(0, config.truncate);
   }
 
